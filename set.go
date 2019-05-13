@@ -63,17 +63,16 @@ func NewFromStringSlice(s []string) (d *datum) {
 func Clone(d *datum) (d2 *datum) {
 	d2 = New()
 
-	d.storeMutex.RLock()
-	d.cachedHashMutex.RLock()
+	defer d.equalityTestMutex.RUnlock()
+	defer d.cachedHashMutex.RUnlock()
+	defer d.storeMutex.RUnlock()
 	d.equalityTestMutex.RLock()
+	d.cachedHashMutex.RLock()
+	d.storeMutex.RLock()
 
 	d2.store = d.store[:]
 	d2.cachedHash = d.cachedHash
 	d2.equalityTest = d.equalityTest
-
-	d.equalityTestMutex.RUnlock()
-	d.cachedHashMutex.RUnlock()
-	d.storeMutex.RUnlock()
 
 	return
 }

@@ -34,15 +34,14 @@ func (d *datum) addOne(value interface{}) {
 }
 
 func (d *datum) Add(values ...interface{}) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
 	d.storeMutex.Lock()
 	d.equalityTestMutex.RLock()
 
 	for _, v := range values {
 		d.addOne(v)
 	}
-
-	d.equalityTestMutex.RUnlock()
-	d.storeMutex.Unlock()
 }
 
 // storeMutex should be locked before calling
@@ -69,15 +68,14 @@ func (d *datum) removeOne(value interface{}) {
 }
 
 func (d *datum) Remove(values ...interface{}) {
-	d.storeMutex.Lock()
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
 	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
 
 	for _, v := range values {
 		d.removeOne(v)
 	}
-
-	d.equalityTestMutex.RUnlock()
-	d.storeMutex.Unlock()
 }
 
 // storeMutex should be read-locked before calling
@@ -133,14 +131,13 @@ func (d *datum) Pick() (value interface{}) {
 }
 
 func (d *datum) Clear() {
-	d.storeMutex.Lock()
+	defer d.cachedHashMutex.Unlock()
+	defer d.storeMutex.Unlock()
 	d.cachedHashMutex.Lock()
+	d.storeMutex.Lock()
 
 	d.store = make(InterfaceSlice, 0, cap(d.store))
 	d.cachedHash = nil
-
-	d.cachedHashMutex.Unlock()
-	d.storeMutex.Unlock()
 }
 
 type ForEachCallback (func(interface{}))
@@ -343,7 +340,7 @@ func (d *datum) Subset(d2 *datum) bool {
 	return Subset(d, d2)
 }
 
-// seed the random-number generator for use in Pick and Pop functions
+// seed the random-number generator for use in the pick method
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
