@@ -19,15 +19,15 @@ func (d *datum) addOne(value interface{}) {
 	}
 
 	defer d.storeMutex.Unlock()
+	defer d.equalityTestMutex.RUnlock()
 	d.storeMutex.Lock()
-
 	d.equalityTestMutex.RLock()
+
 	for _, v := range d.store {
 		if d.equalityTest(v, value) {
 			return
 		}
 	}
-	d.equalityTestMutex.RUnlock()
 
 	d.store = append(d.store, value)
 
