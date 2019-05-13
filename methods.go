@@ -44,8 +44,7 @@ func (d *datum) Add(values ...interface{}) {
 
 // storeMutex should be locked before calling
 func (d *datum) removeOneByIndex(i int) {
-	if l := len(d.store); i < l {
-		j := l - 1
+	if j := len(d.store) - 1; i <= j {
 		d.store[j], d.store[i] = d.store[i], d.store[j]
 		d.store = d.store[:j]
 
