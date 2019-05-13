@@ -13,15 +13,12 @@ func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
 	d.equalityTestMutex.Unlock()
 }
 
+// storeMutex should be locked before calling;
+// equalityTestMutex should be read-locked before calling
 func (d *datum) addOne(value interface{}) {
 	if value == nil {
 		return
 	}
-
-	defer d.storeMutex.Unlock()
-	defer d.equalityTestMutex.RUnlock()
-	d.storeMutex.Lock()
-	d.equalityTestMutex.RLock()
 
 	for _, v := range d.store {
 		if d.equalityTest(v, value) {
@@ -37,9 +34,15 @@ func (d *datum) addOne(value interface{}) {
 }
 
 func (d *datum) Add(values ...interface{}) {
+	d.storeMutex.Lock()
+	d.equalityTestMutex.RLock()
+
 	for _, v := range values {
 		d.addOne(v)
 	}
+
+	d.equalityTestMutex.RUnlock()
+	d.storeMutex.Unlock()
 }
 
 // storeMutex should be locked before calling
@@ -54,12 +57,9 @@ func (d *datum) removeOneByIndex(i int) {
 	}
 }
 
+// storeMutex should be locked before calling;
+// equalityTestMutex should be read-locked before calling
 func (d *datum) removeOne(value interface{}) {
-	defer d.storeMutex.Unlock()
-	defer d.equalityTestMutex.RUnlock()
-	d.storeMutex.Lock()
-	d.equalityTestMutex.RLock()
-
 	for i, v := range d.store {
 		if d.equalityTest(v, value) {
 			d.removeOneByIndex(i)
@@ -69,9 +69,15 @@ func (d *datum) removeOne(value interface{}) {
 }
 
 func (d *datum) Remove(values ...interface{}) {
+	d.storeMutex.Lock()
+	d.equalityTestMutex.RLock()
+
 	for _, v := range values {
 		d.removeOne(v)
 	}
+
+	d.equalityTestMutex.RUnlock()
+	d.storeMutex.Unlock()
 }
 
 // storeMutex should be read-locked before calling
