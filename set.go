@@ -78,11 +78,9 @@ func Union(d1, d2 *datum) (d3 *datum) {
 	d1.storeMutex.RLock()
 	d2.storeMutex.RLock()
 
-	l1, l2 := len(d1.store), len(d2.store)
+	d3 = New()
 
-	d3 = NewWithCapacity(l1 + l2)
-
-	if l2 > l1 {
+	if len(d2.store) > len(d1.store) {
 		d2, d1 = d1, d2
 	}
 
