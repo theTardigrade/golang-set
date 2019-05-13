@@ -235,15 +235,15 @@ func (d *datum) Some(callback SomeCallback) bool {
 }
 
 func (d *datum) Equal(d2 *datum) bool {
-	defer d.storeMutex.Unlock()
-	d.storeMutex.Lock()
+	defer d.storeMutex.RUnlock()
+	d.storeMutex.RLock()
 
 	if d2 == d {
 		return true
 	}
 
-	defer d2.storeMutex.Unlock()
-	d2.storeMutex.Lock()
+	defer d2.storeMutex.RUnlock()
+	d2.storeMutex.RLock()
 
 	l, l2 := len(d.store), len(d2.store)
 
