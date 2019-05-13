@@ -145,7 +145,7 @@ func (d *datum) Clear() {
 
 type ForEachCallback (func(interface{}))
 
-func (d *datum) ForEachCallback(callback ForEachCallback) {
+func (d *datum) ForEach(callback ForEachCallback) {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
