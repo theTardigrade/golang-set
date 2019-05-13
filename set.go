@@ -65,13 +65,13 @@ func Clone(d *datum) (d2 *datum) {
 
 	d.storeMutex.RLock()
 	d.cachedHashMutex.RLock()
-	d.equalityTestMutex.RUnlock()
+	d.equalityTestMutex.RLock()
 
 	d2.store = d.store[:]
 	d2.cachedHash = d.cachedHash
 	d2.equalityTest = d.equalityTest
 
-	d.equalityTestMutex.RLock()
+	d.equalityTestMutex.RUnlock()
 	d.cachedHashMutex.RUnlock()
 	d.storeMutex.RUnlock()
 
