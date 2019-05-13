@@ -133,14 +133,14 @@ func (d *datum) Pick() (value interface{}) {
 }
 
 func (d *datum) Clear() {
-	defer d.storeMutex.Unlock()
 	d.storeMutex.Lock()
+	d.cachedHashMutex.Lock()
 
 	d.store = make(InterfaceSlice, 0, cap(d.store))
-
-	d.cachedHashMutex.Lock()
 	d.cachedHash = nil
+
 	d.cachedHashMutex.Unlock()
+	d.storeMutex.Unlock()
 }
 
 type ForEachCallback (func(interface{}))
