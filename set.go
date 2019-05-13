@@ -9,10 +9,8 @@ type InterfaceSlice []interface{}
 
 type equalityTestFunc (func(interface{}, interface{}) bool)
 
-type datumStore InterfaceSlice
-
 type datum struct {
-	store             datumStore
+	store             InterfaceSlice
 	storeMutex        sync.RWMutex
 	cachedHash        *uint64
 	cachedHashMutex   sync.Mutex
@@ -29,7 +27,7 @@ func New() *datum {
 func NewWithCapacity(c int) (d *datum) {
 	d = New()
 
-	d.store = make(datumStore, 0, c)
+	d.store = make(InterfaceSlice, 0, c)
 
 	return
 }

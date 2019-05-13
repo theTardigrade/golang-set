@@ -125,7 +125,7 @@ func (d *datum) Clear() {
 	defer d.storeMutex.Unlock()
 	d.storeMutex.Lock()
 
-	d.store = make(datumStore, 0, cap(d.store))
+	d.store = make(InterfaceSlice, 0, cap(d.store))
 
 	d.cachedHashMutex.Lock()
 	d.cachedHash = nil
