@@ -105,10 +105,21 @@ func (d *datum) Pop() (value interface{}) {
 	defer d.storeMutex.Unlock()
 	d.storeMutex.Lock()
 
+	value, index := d.pick()
+	if index > -1 {
+		d.removeOneByIndex(index)
+	}
+
+	return
+}
+
+// storeMutex should be read-locked before calling
+func (d *datum) pick() (value interface{}, index int) {
 	if l := len(d.store); l > 0 {
-		i := rand.Int() % l
-		value = d.store[i]
-		d.removeOneByIndex(i)
+		index = rand.Intn(l)
+		value = d.store[index]
+	} else {
+		index = -1
 	}
 
 	return
@@ -118,10 +129,7 @@ func (d *datum) Pick() (value interface{}) {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
-	if l := len(d.store); l > 0 {
-		i := rand.Int() % l
-		value = d.store[i]
-	}
+	value, _ = d.pick()
 
 	return
 }
