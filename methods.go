@@ -106,7 +106,7 @@ func (d *datum) Pop() (value interface{}) {
 	d.storeMutex.Lock()
 
 	value, index := d.pick()
-	if index > -1 {
+	if value == nil {
 		d.removeOneByIndex(index)
 	}
 
@@ -118,8 +118,6 @@ func (d *datum) pick() (value interface{}, index int) {
 	if l := len(d.store); l > 0 {
 		index = rand.Intn(l)
 		value = d.store[index]
-	} else {
-		index = -1
 	}
 
 	return
