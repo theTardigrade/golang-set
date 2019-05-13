@@ -332,6 +332,7 @@ func (d *datum) Subset(d2 *datum) bool {
 	return Subset(d, d2)
 }
 
+// seed the random-number generator for use in Pick and Pop functions
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
