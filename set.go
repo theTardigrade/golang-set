@@ -13,7 +13,7 @@ type datum struct {
 	store             InterfaceSlice
 	storeMutex        sync.RWMutex
 	cachedHash        *uint64
-	cachedHashMutex   sync.Mutex
+	cachedHashMutex   sync.RWMutex
 	equalityTest      equalityTestFunc
 	equalityTestMutex sync.RWMutex
 }
@@ -61,11 +61,19 @@ func NewFromStringSlice(s []string) (d *datum) {
 }
 
 func Clone(d *datum) (d2 *datum) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
-
 	d2 = New()
+
+	d.storeMutex.RLock()
+	d.cachedHashMutex.RLock()
+	d.equalityTestMutex.RUnlock()
+
 	d2.store = d.store[:]
+	d2.cachedHash = d.cachedHash
+	d2.equalityTest = d.equalityTest
+
+	d.equalityTestMutex.RLock()
+	d.cachedHashMutex.RUnlock()
+	d.storeMutex.RUnlock()
 
 	return
 }
