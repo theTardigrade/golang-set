@@ -19,15 +19,15 @@ func (d *datum) addOne(value interface{}) {
 	}
 
 	defer d.storeMutex.Unlock()
-	defer d.equalityTestMutex.RUnlock()
 	d.storeMutex.Lock()
-	d.equalityTestMutex.RLock()
 
+	d.equalityTestMutex.RLock()
 	for _, v := range d.store {
 		if d.equalityTest(v, value) {
 			return
 		}
 	}
+	d.equalityTestMutex.RUnlock()
 
 	d.store = append(d.store, value)
 
@@ -43,7 +43,7 @@ func (d *datum) Add(values ...interface{}) {
 }
 
 // storeMutex should be locked before calling
-func (d *datum) removeIndex(i int) {
+func (d *datum) removeOneByIndex(i int) {
 	if l := len(d.store); i < l {
 		j := l - 1
 		d.store[j], d.store[i] = d.store[i], d.store[j]
@@ -55,7 +55,7 @@ func (d *datum) removeIndex(i int) {
 	}
 }
 
-func (d *datum) Remove(value interface{}) {
+func (d *datum) removeOne(value interface{}) {
 	defer d.storeMutex.Unlock()
 	defer d.equalityTestMutex.RUnlock()
 	d.storeMutex.Lock()
@@ -63,9 +63,15 @@ func (d *datum) Remove(value interface{}) {
 
 	for i, v := range d.store {
 		if d.equalityTest(v, value) {
-			d.removeIndex(i)
+			d.removeOneByIndex(i)
 			return
 		}
+	}
+}
+
+func (d *datum) Remove(values ...interface{}) {
+	for _, v := range values {
+		d.removeOne(v)
 	}
 }
 
@@ -97,7 +103,7 @@ func (d *datum) Pop() (value interface{}) {
 	if l := len(d.store); l > 0 {
 		i := rand.Int() % l
 		value = d.store[i]
-		d.removeIndex(i)
+		d.removeOneByIndex(i)
 	}
 
 	return
@@ -156,7 +162,7 @@ func (d *datum) FilterCallback(callback FilterCallback) {
 
 	for i, v := range d.store {
 		if !callback(v) {
-			d.removeIndex(i)
+			d.removeOneByIndex(i)
 		}
 	}
 }
