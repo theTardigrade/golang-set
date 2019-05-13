@@ -106,7 +106,7 @@ func (d *datum) Pop() (value interface{}) {
 	d.storeMutex.Lock()
 
 	value, index := d.pick()
-	if value == nil {
+	if value != nil {
 		d.removeOneByIndex(index)
 	}
 
