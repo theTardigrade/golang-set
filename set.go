@@ -37,7 +37,7 @@ func NewWithCapacity(c int) (d *datum) {
 }
 
 func NewFromSlice(s InterfaceSlice) (d *datum) {
-	d = New()
+	d = NewWithCapacity(len(s))
 
 	d.Add(s...)
 
@@ -45,20 +45,22 @@ func NewFromSlice(s InterfaceSlice) (d *datum) {
 }
 
 func NewFromIntSlice(s []int) (d *datum) {
-	d = New()
+	l := len(s)
+	d = NewWithCapacity(l)
 
-	for _, v := range s {
-		d.addOne(v)
+	for i := 0; i < l; i++ {
+		d.addOne(s[i])
 	}
 
 	return
 }
 
 func NewFromStringSlice(s []string) (d *datum) {
-	d = New()
+	l := len(s)
+	d = NewWithCapacity(l)
 
-	for _, v := range s {
-		d.addOne(v)
+	for i := 0; i < l; i++ {
+		d.addOne(s[i])
 	}
 
 	return
