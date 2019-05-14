@@ -9,6 +9,10 @@ type InterfaceSlice []interface{}
 
 type equalityTestFunc (func(interface{}, interface{}) bool)
 
+var (
+	defaultEqualityTest equalityTestFunc = reflect.DeepEqual
+)
+
 type datum struct {
 	store             InterfaceSlice
 	storeMutex        sync.RWMutex
@@ -20,7 +24,7 @@ type datum struct {
 
 func New() *datum {
 	return &datum{
-		equalityTest: reflect.DeepEqual,
+		equalityTest: defaultEqualityTest,
 	}
 }
 

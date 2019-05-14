@@ -8,6 +8,10 @@ import (
 )
 
 func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
+	if equalityTest == nil {
+		equalityTest = defaultEqualityTest
+	}
+
 	d.equalityTestMutex.Lock()
 	d.equalityTest = equalityTest
 	d.equalityTestMutex.Unlock()
