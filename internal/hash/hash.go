@@ -7,22 +7,22 @@ import (
 )
 
 const (
-	maxHashCacheLen = 1 << 12
+	cacheMaxLen = 1 << 12
 )
 
-type hashCacheType map[interface{}]uint64
+type cacheType map[interface{}]uint64
 
 var (
-	hashCacheBackup hashCacheType
-	hashCache       = make(hashCacheType)
-	hashCacheMutex  sync.Mutex
+	cacheBackup cacheType
+	cache       = make(cacheType)
+	cacheMutex  sync.Mutex
 )
 
 func Get(value interface{}) (hashedValue uint64) {
 	var useCache bool
 
-	defer hashCacheMutex.Unlock()
-	hashCacheMutex.Lock()
+	defer cacheMutex.Unlock()
+	cacheMutex.Lock()
 
 	switch value.(type) {
 	case int, int8, int16, int32, int64,
@@ -33,7 +33,7 @@ func Get(value interface{}) (hashedValue uint64) {
 		{
 			var found bool
 
-			if hashedValue, found = hashCache[value]; found {
+			if hashedValue, found = cache[value]; found {
 				return
 			}
 
@@ -47,23 +47,25 @@ func Get(value interface{}) (hashedValue uint64) {
 	}
 
 	if useCache {
-		if l := len(hashCache); l >= maxHashCacheLen {
-			hashCache = make(hashCacheType)
+		if l, m := len(cache), cacheMaxLen; l >= m {
+			cache = make(cacheType)
 
-			for k, v := range hashCacheBackup {
-				hashCache[k] = v
+			for k, v := range cacheBackup {
+				cache[k] = v
 			}
 
-			hashCacheBackup = nil
-		} else if hashCacheBackup == nil && l >= maxHashCacheLen/2 {
-			hashCacheBackup = make(hashCacheType)
+			cacheBackup = nil
+		} else if cacheBackup == nil {
+			if m /= 2; l >= m {
+				cacheBackup = make(cacheType)
 
-			for k, v := range hashCache {
-				hashCacheBackup[k] = v
+				for k, v := range cache {
+					cacheBackup[k] = v
+				}
 			}
 		}
 
-		hashCache[value] = hashedValue
+		cache[value] = hashedValue
 	}
 
 	return
