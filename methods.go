@@ -196,20 +196,23 @@ func (d *datum) makeStore(capacity int) {
 	d.store = make(storeData, 0, capacity)
 }
 
-// storeMutex should be locked before calling;
-// cachedHashMutex should be locked before calling;
+// storeMutex should be locked before calling
 func (d *datum) clear(capacity int) {
 	d.makeStore(capacity)
-	d.cachedHash = nil
+	d.clearCachedHash()
 }
 
-func (d *datum) Clear() {
-	defer d.cachedHashMutex.Unlock()
+func (d *datum) Clear(keepCapacity bool) {
 	defer d.storeMutex.Unlock()
-	d.cachedHashMutex.Lock()
 	d.storeMutex.Lock()
 
-	d.clear(cap(d.store))
+	var capacity int
+
+	if keepCapacity {
+		capacity = cap(d.store)
+	}
+
+	d.clear(capacity)
 }
 
 type ForEachCallback (func(interface{}))
