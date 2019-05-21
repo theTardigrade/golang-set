@@ -498,13 +498,8 @@ func (d *datum) Int64Sum() (accumulator int64) {
 			newValue = value
 		case int, int8, int16, int32,
 			uint, uint8, uint16, uint32, uint64:
-			{
-				v := reflect.ValueOf(value)
-				v = reflect.Indirect(v)
-
-				if v.Type().ConvertibleTo(int64Type) {
-					newValue = v.Convert(int64Type).Int()
-				}
+			if v := reflect.ValueOf(value); v.Type().ConvertibleTo(int64Type) {
+				newValue = v.Convert(int64Type).Int()
 			}
 		default:
 			continue
@@ -517,6 +512,8 @@ func (d *datum) Int64Sum() (accumulator int64) {
 }
 
 func (d *datum) Int64Product() (accumulator int64) {
+	accumulator = 1
+
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
@@ -528,13 +525,8 @@ func (d *datum) Int64Product() (accumulator int64) {
 			newValue = value
 		case int, int8, int16, int32,
 			uint, uint8, uint16, uint32, uint64:
-			{
-				v := reflect.ValueOf(value)
-				v = reflect.Indirect(v)
-
-				if v.Type().ConvertibleTo(int64Type) {
-					newValue = v.Convert(int64Type).Int()
-				}
+			if v := reflect.ValueOf(value); v.Type().ConvertibleTo(int64Type) {
+				newValue = v.Convert(int64Type).Int()
 			}
 		default:
 			continue
@@ -563,13 +555,8 @@ func (d *datum) Float64Sum() (accumulator float64) {
 		case float32,
 			int, int8, int16, int32, int64,
 			uint, uint8, uint16, uint32, uint64:
-			{
-				v := reflect.ValueOf(value)
-				v = reflect.Indirect(v)
-
-				if v.Type().ConvertibleTo(float64Type) {
-					newValue = v.Convert(float64Type).Float()
-				}
+			if v := reflect.ValueOf(value); v.Type().ConvertibleTo(float64Type) {
+				newValue = v.Convert(float64Type).Float()
 			}
 		default:
 			continue
@@ -596,13 +583,8 @@ func (d *datum) Float64Product() (accumulator float64) {
 		case float32,
 			int, int8, int16, int32, int64,
 			uint, uint8, uint16, uint32, uint64:
-			{
-				v := reflect.ValueOf(value)
-				v = reflect.Indirect(v)
-
-				if v.Type().ConvertibleTo(float64Type) {
-					newValue = v.Convert(float64Type).Float()
-				}
+			if v := reflect.ValueOf(value); v.Type().ConvertibleTo(float64Type) {
+				newValue = v.Convert(float64Type).Float()
 			}
 		default:
 			continue
