@@ -191,7 +191,7 @@ func (d *datum) Pick() (value interface{}) {
 
 // storeMutex should be locked before calling
 func (d *datum) makeStore(capacity int) {
-	d.store = make([]*storeDatum, 0, capacity)
+	d.store = make(storeData, 0, capacity)
 }
 
 // storeMutex should be locked before calling;

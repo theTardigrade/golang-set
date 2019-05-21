@@ -26,8 +26,14 @@ func newStoreDatum(value interface{}) *storeDatum {
 	}
 }
 
+type storeData []*storeDatum
+
+func (s storeData) Len() int           { return len(s) }
+func (s storeData) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s storeData) Less(i, j int) bool { return s[i].hash < s[j].hash }
+
 type datum struct {
-	store             []*storeDatum
+	store             storeData
 	storeMutex        sync.RWMutex
 	cachedHash        *uint64
 	cachedHashMutex   sync.RWMutex
