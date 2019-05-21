@@ -713,11 +713,9 @@ func (d *datum) String() string {
 
 	l := len(d.store)
 
-	if l > 1 {
-		if !d.sorted {
-			sort.Sort(d.store)
-			d.sorted = true
-		}
+	if l > 1 && !d.sorted {
+		sort.Sort(d.store)
+		d.sorted = true
 	}
 
 	var builder strings.Builder
