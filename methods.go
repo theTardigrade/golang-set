@@ -11,15 +11,19 @@ import (
 	"github.com/theTardigrade/set/internal/hash"
 )
 
-func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
-	if equalityTest == nil {
+func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
+	if equalityTest != nil {
 		return
 	}
+
+	success = true
 
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
 	d.equalityTest = equalityTest
+
+	return
 }
 
 // mutex should be locked before calling;
