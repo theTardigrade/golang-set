@@ -29,7 +29,7 @@ func Get(value interface{}) (hashedValue uint64) {
 		uint, uint8, uint16, uint32, uint64,
 		float32, float64,
 		complex64, complex128,
-		string, bool:
+		bool:
 		{
 			var found bool
 
