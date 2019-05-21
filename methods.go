@@ -106,21 +106,24 @@ func (d *datum) removeOneFromIndex(i int) {
 // storeMutex should be locked before calling;
 // equalityTestMutex should be read-locked before calling;
 // clearCachedHash method should be called afterwards
-func (d *datum) removeOneFromDatum(s *storeDatum) {
+func (d *datum) removeOneFromDatum(s *storeDatum) (success bool) {
 	for i, s2 := range d.store {
 		if d.equalityTest(s, s2) {
 			d.removeOneFromIndex(i)
-			return
+			success = true
+			break
 		}
 	}
+
+	return
 }
 
 // storeMutex should be locked before calling;
 // equalityTestMutex should be read-locked before calling;
 // clearCachedHash method should be called afterwards
-func (d *datum) removeOne(value interface{}) {
+func (d *datum) removeOne(value interface{}) bool {
 	s := newStoreDatum(value)
-	d.removeOneFromDatum(s)
+	return d.removeOneFromDatum(s)
 }
 
 func (d *datum) Remove(values ...interface{}) {
@@ -129,11 +132,17 @@ func (d *datum) Remove(values ...interface{}) {
 	d.equalityTestMutex.RLock()
 	d.storeMutex.Lock()
 
+	var modified bool
+
 	for _, v := range values {
-		d.removeOne(v)
+		if d.removeOne(v) {
+			modified = true
+		}
 	}
 
-	d.clearCachedHash()
+	if modified {
+		d.clearCachedHash()
+	}
 }
 
 // storeMutex should be read-locked before calling
@@ -243,13 +252,18 @@ func (d *datum) FilterCallback(callback FilterCallback) {
 	defer d.storeMutex.Unlock()
 	d.storeMutex.Lock()
 
+	var modified bool
+
 	for i, v := range d.store {
 		if !callback(v) {
 			d.removeOneFromIndex(i)
+			modified = true
 		}
 	}
 
-	d.clearCachedHash()
+	if modified {
+		d.clearCachedHash()
+	}
 }
 
 type ReduceCallback (func(interface{}, interface{}) interface{})
