@@ -71,8 +71,229 @@ func (d *datum) AddFromSlice(values []interface{}) {
 func (d *datum) AddFromIntSlice(values []int) {
 	defer d.equalityTestMutex.RUnlock()
 	defer d.storeMutex.Unlock()
-	d.storeMutex.Lock()
 	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromInt8Slice(values []int8) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromInt16Slice(values []int16) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromInt32Slice(values []int32) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromInt64Slice(values []int64) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromUintSlice(values []uint) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromUint8Slice(values []uint8) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromUint16Slice(values []uint16) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromUint32Slice(values []uint32) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromUint64Slice(values []uint64) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromUinptrSlice(values []uintptr) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromFloat32Slice(values []float32) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromFloat64Slice(values []float64) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromComplex64Slice(values []complex64) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromComplex128Slice(values []complex128) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromByteSlice(values []byte) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromRuneSlice(values []rune) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+
+	d.clearCachedHash()
+}
+
+func (d *datum) AddFromBoolSlice(values []rune) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
 
 	for i := len(values) - 1; i >= 0; i-- {
 		d.addOne(values[i])
@@ -84,8 +305,8 @@ func (d *datum) AddFromIntSlice(values []int) {
 func (d *datum) AddFromStringSlice(values []string) {
 	defer d.equalityTestMutex.RUnlock()
 	defer d.storeMutex.Unlock()
-	d.storeMutex.Lock()
 	d.equalityTestMutex.RLock()
+	d.storeMutex.Lock()
 
 	for i := len(values) - 1; i >= 0; i-- {
 		d.addOne(values[i])
