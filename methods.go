@@ -598,32 +598,34 @@ func (d *datum) Float64Product() (accumulator float64) {
 
 type EveryCallback FilterCallback
 
-func (d *datum) Every(callback EveryCallback) bool {
+func (d *datum) Every(callback EveryCallback) (success bool) {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
 	for _, v := range d.store {
 		if !callback(v) {
-			return false
+			return
 		}
 	}
 
-	return true
+	success = true
+	return
 }
 
 type SomeCallback EveryCallback
 
-func (d *datum) Some(callback SomeCallback) bool {
+func (d *datum) Some(callback SomeCallback) (success bool) {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
 	for _, v := range d.store {
 		if callback(v) {
-			return true
+			success = true
+			break
 		}
 	}
 
-	return false
+	return
 }
 
 func (d *datum) Equal(d2 *datum) bool {
