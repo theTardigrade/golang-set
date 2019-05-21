@@ -3,6 +3,7 @@ package set
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"strings"
 	"time"
 
@@ -23,7 +24,7 @@ func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
 // equalityTestMutex should be read-locked before calling;
 // clearCachedHash method should be called afterwards;
 // s.value should not equal nil
-func (d *datum) addOneFromDatum(s *storeDatum) {
+func (d *datum) addOneFromDatum(s *storeDatum) (success bool) {
 	for _, s2 := range d.store {
 		if d.equalityTest(s, s2) {
 			return
@@ -31,288 +32,266 @@ func (d *datum) addOneFromDatum(s *storeDatum) {
 	}
 
 	d.store = append(d.store, s)
+	success = true
+
+	return
 }
 
 // storeMutex should be locked before calling;
 // equalityTestMutex should be read-locked before calling;
 // clearCachedHash method should be called afterwards
-func (d *datum) addOne(value interface{}) {
-	if value == nil {
-		return
+func (d *datum) addOne(value interface{}) (success bool) {
+	if value != nil {
+		s := newStoreDatumWithIndex(value, len(d.store))
+		success = d.addOneFromDatum(s)
 	}
 
-	s := newStoreDatumWithIndex(value, len(d.store))
-	d.addOneFromDatum(s)
+	return
 }
 
 func (d *datum) clearCachedHash() {
 	d.cachedHashMutex.Lock()
 	d.cachedHash = nil
 	d.cachedHashMutex.Unlock()
+
+	d.sortedMutex.Lock()
+	d.sorted = false
+	d.sortedMutex.Unlock()
 }
 
-func (d *datum) Add(values ...interface{}) {
-	defer d.equalityTestMutex.RUnlock()
+func (d *datum) Add(values ...interface{}) (success bool) {
 	defer d.storeMutex.Unlock()
 	d.storeMutex.Lock()
-	d.equalityTestMutex.RLock()
 
-	for _, v := range values {
-		d.addOne(v)
+	if l := len(values); l > 0 {
+		defer d.equalityTestMutex.RUnlock()
+		d.equalityTestMutex.RLock()
+
+		for l--; l >= 0; l-- {
+			if d.addOne(values[l]) {
+				success = true
+			}
+		}
+
+		if success {
+			d.clearCachedHash()
+		}
 	}
 
-	d.clearCachedHash()
+	return
 }
 
 func (d *datum) AddFromSlice(values []interface{}) {
 	d.Add(values...)
 }
 
-func (d *datum) AddFromIntSlice(values []int) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromIntSlice(values []int) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromInt8Slice(values []int8) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromInt8Slice(values []int8) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromInt16Slice(values []int16) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromInt16Slice(values []int16) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromInt32Slice(values []int32) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromInt32Slice(values []int32) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromInt64Slice(values []int64) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromInt64Slice(values []int64) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromUintSlice(values []uint) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromUintSlice(values []uint) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromUint8Slice(values []uint8) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromUint8Slice(values []uint8) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromUint16Slice(values []uint16) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromUint16Slice(values []uint16) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromUint32Slice(values []uint32) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromUint32Slice(values []uint32) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromUint64Slice(values []uint64) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromUint64Slice(values []uint64) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromUinptrSlice(values []uintptr) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromUinptrSlice(values []uintptr) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromFloat32Slice(values []float32) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromFloat32Slice(values []float32) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromFloat64Slice(values []float64) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromFloat64Slice(values []float64) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromComplex64Slice(values []complex64) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromComplex64Slice(values []complex64) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromComplex128Slice(values []complex128) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromComplex128Slice(values []complex128) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromByteSlice(values []byte) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromByteSlice(values []byte) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromRuneSlice(values []rune) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromRuneSlice(values []rune) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromBoolSlice(values []rune) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromBoolSlice(values []bool) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
-func (d *datum) AddFromStringSlice(values []string) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+func (d *datum) AddFromStringSlice(values []string) bool {
+	l := len(values)
+	i := make([]interface{}, l)
 
-	for i := len(values) - 1; i >= 0; i-- {
-		d.addOne(values[i])
+	for l--; l >= 0; l-- {
+		i[l] = values[l]
 	}
 
-	d.clearCachedHash()
+	return d.Add(i...)
 }
 
 // storeMutex should be locked before calling;
@@ -347,23 +326,23 @@ func (d *datum) removeOne(value interface{}) bool {
 	return d.removeOneFromDatum(s)
 }
 
-func (d *datum) Remove(values ...interface{}) {
+func (d *datum) Remove(values ...interface{}) (success bool) {
 	defer d.equalityTestMutex.RUnlock()
 	defer d.storeMutex.Unlock()
 	d.equalityTestMutex.RLock()
 	d.storeMutex.Lock()
 
-	var modified bool
-
 	for _, v := range values {
 		if d.removeOne(v) {
-			modified = true
+			success = true
 		}
 	}
 
-	if modified {
+	if success {
 		d.clearCachedHash()
 	}
+
+	return
 }
 
 // storeMutex should be read-locked before calling
@@ -629,6 +608,19 @@ func (d *datum) storeValueStringFromIndex(i int) (s string) {
 }
 
 func (d *datum) String() string {
+	func() {
+		defer d.sortedMutex.Unlock()
+		d.sortedMutex.Lock()
+
+		if !d.sorted {
+			defer d.storeMutex.Unlock()
+			d.storeMutex.Lock()
+
+			sort.Sort(d.store)
+			d.sorted = true
+		}
+	}()
+
 	var builder strings.Builder
 
 	builder.WriteByte('[')

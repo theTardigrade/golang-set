@@ -46,10 +46,12 @@ func (s storeData) Swap(i, j int) {
 type datum struct {
 	store             storeData
 	storeMutex        sync.RWMutex
-	cachedHash        *uint64
-	cachedHashMutex   sync.RWMutex
 	equalityTest      equalityTestFunc
 	equalityTestMutex sync.RWMutex
+	cachedHash        *uint64
+	cachedHashMutex   sync.RWMutex
+	sorted            bool
+	sortedMutex       sync.Mutex
 }
 
 func New() *datum {
