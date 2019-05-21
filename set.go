@@ -36,8 +36,12 @@ func newStoreDatumWithIndex(value interface{}, index int) *storeDatum {
 type storeData []*storeDatum
 
 func (s storeData) Len() int           { return len(s) }
-func (s storeData) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s storeData) Less(i, j int) bool { return s[i].hash < s[j].hash }
+func (s storeData) Swap(i, j int) {
+	sI, sJ := s[i], s[j]
+	sI.index, sJ.index = sJ.index, sI.index
+	s[i], s[j] = sJ, sI
+}
 
 type datum struct {
 	store             storeData
