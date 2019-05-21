@@ -1,10 +1,12 @@
 package set
 
 import (
+	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/theTardigrade/set/internal/hash"
 )
 
 func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
@@ -19,19 +21,27 @@ func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
 
 // storeMutex should be locked before calling;
 // equalityTestMutex should be read-locked before calling;
+// clearCachedHash method should be called afterwards;
+// s.value should not equal nil
+func (d *datum) addOneFromDatum(s *storeDatum) {
+	for _, s2 := range d.store {
+		if d.equalityTest(s, s2) {
+			return
+		}
+	}
+
+	d.store = append(d.store, s)
+}
+
+// storeMutex should be locked before calling;
+// equalityTestMutex should be read-locked before calling;
 // clearCachedHash method should be called afterwards
 func (d *datum) addOne(value interface{}) {
 	if value == nil {
 		return
 	}
 
-	for _, v := range d.store {
-		if d.equalityTest(v, value) {
-			return
-		}
-	}
-
-	d.store = append(d.store, value)
+	d.addOneFromDatum(newStoreDatum(value))
 }
 
 func (d *datum) clearCachedHash() {
@@ -83,27 +93,32 @@ func (d *datum) AddFromStringSlice(values []string) {
 	d.clearCachedHash()
 }
 
-// storeMutex should be locked before calling
-func (d *datum) removeOneByIndex(i int) {
+// storeMutex should be locked before calling;
+// clearCachedHash method should be called afterwards
+func (d *datum) removeOneFromIndex(i int) {
 	if j := len(d.store) - 1; i <= j {
 		d.store[j], d.store[i] = d.store[i], d.store[j]
 		d.store = d.store[:j]
-
-		d.cachedHashMutex.Lock()
-		d.cachedHash = nil
-		d.cachedHashMutex.Unlock()
 	}
 }
 
 // storeMutex should be locked before calling;
-// equalityTestMutex should be read-locked before calling
-func (d *datum) removeOne(value interface{}) {
-	for i, v := range d.store {
-		if d.equalityTest(v, value) {
-			d.removeOneByIndex(i)
+// equalityTestMutex should be read-locked before calling;
+// clearCachedHash method should be called afterwards
+func (d *datum) removeOneFromDatum(s *storeDatum) {
+	for i, s2 := range d.store {
+		if d.equalityTest(s, s2) {
+			d.removeOneFromIndex(i)
 			return
 		}
 	}
+}
+
+// storeMutex should be locked before calling;
+// equalityTestMutex should be read-locked before calling;
+// clearCachedHash method should be called afterwards
+func (d *datum) removeOne(value interface{}) {
+	d.removeOneFromDatum(newStoreDatum(value))
 }
 
 func (d *datum) Remove(values ...interface{}) {
@@ -115,15 +130,19 @@ func (d *datum) Remove(values ...interface{}) {
 	for _, v := range values {
 		d.removeOne(v)
 	}
+
+	d.clearCachedHash()
 }
 
 // storeMutex should be read-locked before calling
 func (d *datum) contains(value interface{}) bool {
+	s1 := newStoreDatum(value)
+
 	defer d.equalityTestMutex.RUnlock()
 	d.equalityTestMutex.RLock()
 
-	for _, v := range d.store {
-		if d.equalityTest(v, value) {
+	for _, s2 := range d.store {
+		if d.equalityTest(s1, s2) {
 			return true
 		}
 	}
@@ -144,7 +163,8 @@ func (d *datum) Pop() (value interface{}) {
 
 	value, index := d.pick()
 	if value != nil {
-		d.removeOneByIndex(index)
+		d.removeOneFromIndex(index)
+		d.clearCachedHash()
 	}
 
 	return
@@ -169,14 +189,25 @@ func (d *datum) Pick() (value interface{}) {
 	return
 }
 
+// storeMutex should be locked before calling
+func (d *datum) makeStore(capacity int) {
+	d.store = make([]*storeDatum, 0, capacity)
+}
+
+// storeMutex should be locked before calling;
+// cachedHashMutex should be locked before calling;
+func (d *datum) clear(capacity int) {
+	d.makeStore(capacity)
+	d.cachedHash = nil
+}
+
 func (d *datum) Clear() {
 	defer d.cachedHashMutex.Unlock()
 	defer d.storeMutex.Unlock()
 	d.cachedHashMutex.Lock()
 	d.storeMutex.Lock()
 
-	d.store = make([]interface{}, 0, cap(d.store))
-	d.cachedHash = nil
+	d.clear(cap(d.store))
 }
 
 type ForEachCallback (func(interface{}))
@@ -196,8 +227,8 @@ func (d *datum) Map(callback MapCallback) {
 	defer d.storeMutex.Unlock()
 	d.storeMutex.Lock()
 
-	for i, v := range d.store {
-		d.store[i] = callback(v)
+	for i, s := range d.store {
+		d.store[i].value = callback(s.value)
 	}
 }
 
@@ -209,9 +240,11 @@ func (d *datum) FilterCallback(callback FilterCallback) {
 
 	for i, v := range d.store {
 		if !callback(v) {
-			d.removeOneByIndex(i)
+			d.removeOneFromIndex(i)
 		}
 	}
+
+	d.clearCachedHash()
 }
 
 type ReduceCallback (func(interface{}, interface{}) interface{})
@@ -233,8 +266,8 @@ func (d *datum) IntSum() (accumulator int) {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
-	for _, v := range d.store {
-		if value, ok := v.(int); ok {
+	for _, s := range d.store {
+		if value, ok := s.value.(int); ok {
 			accumulator += value
 		}
 	}
@@ -248,8 +281,8 @@ func (d *datum) IntProduct() (accumulator int) {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
-	for _, v := range d.store {
-		if value, ok := v.(int); ok {
+	for _, s := range d.store {
+		if value, ok := s.value.(int); ok {
 			accumulator *= value
 		}
 	}
@@ -318,13 +351,7 @@ func (d *datum) hash() (value uint64) {
 	if d.cachedHash != nil {
 		value = *d.cachedHash
 	} else {
-		var err error
-
-		value, err = hashstructure.Hash(d.store, nil)
-		if err != nil {
-			panic(err)
-		}
-
+		value = hash.Get(d.store)
 		d.cachedHash = &value
 	}
 
@@ -338,11 +365,51 @@ func (d *datum) Hash() uint64 {
 	return d.hash()
 }
 
-func (d *datum) Slice() []interface{} {
+func (d *datum) Slice() (values []interface{}) {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
-	return []interface{}(d.store[:])
+	l := len(d.store)
+	values = make([]interface{}, 0, l)
+
+	for l--; l >= 0; l-- {
+		values = append(values, d.store[l].value)
+	}
+
+	return
+}
+
+// storeMutex should be read-locked before calling
+func (d *datum) valueStringFromIndex(i int) (s string) {
+	if i >= 0 && i < len(d.store) {
+		s = fmt.Sprintf("%v", d.store[i].value)
+	}
+
+	return
+}
+
+func (d *datum) String() string {
+	var builder strings.Builder
+
+	builder.WriteByte('[')
+
+	func() {
+		defer d.storeMutex.RUnlock()
+		d.storeMutex.RLock()
+
+		if l := len(d.store); l > 0 {
+			builder.WriteString(d.valueStringFromIndex(0))
+
+			for l--; l > 0; l-- {
+				builder.WriteByte(' ')
+				builder.WriteString(d.valueStringFromIndex(l))
+			}
+		}
+	}()
+
+	builder.WriteByte(']')
+
+	return builder.String()
 }
 
 func (d *datum) Empty() bool {

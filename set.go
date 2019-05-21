@@ -1,18 +1,33 @@
 package set
 
 import (
-	"reflect"
 	"sync"
+
+	"github.com/theTardigrade/set/internal/hash"
 )
 
-type equalityTestFunc (func(interface{}, interface{}) bool)
+type equalityTestFunc (func(*storeDatum, *storeDatum) bool)
 
 var (
-	defaultEqualityTest equalityTestFunc = reflect.DeepEqual
+	defaultEqualityTest equalityTestFunc = func(d1, d2 *storeDatum) bool {
+		return d1.hash == d2.hash
+	}
 )
 
+type storeDatum struct {
+	value interface{}
+	hash  uint64
+}
+
+func newStoreDatum(value interface{}) *storeDatum {
+	return &storeDatum{
+		value: value,
+		hash:  hash.Get(value),
+	}
+}
+
 type datum struct {
-	store             []interface{}
+	store             []*storeDatum
 	storeMutex        sync.RWMutex
 	cachedHash        *uint64
 	cachedHashMutex   sync.RWMutex
@@ -29,7 +44,7 @@ func New() *datum {
 func NewWithCapacity(c int) (d *datum) {
 	d = New()
 
-	d.store = make([]interface{}, 0, c)
+	d.makeStore(c)
 
 	return
 }
@@ -97,7 +112,10 @@ func Union(d1, d2 *datum) (d3 *datum) {
 	}
 
 	d3.store = d1.store[:]
-	d3.Add(d2.store...)
+
+	for _, s := range d2.store {
+		d3.addOneFromDatum(s)
+	}
 
 	return
 }
