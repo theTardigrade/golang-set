@@ -399,7 +399,7 @@ func (d *datum) Slice() (values []interface{}) {
 }
 
 // storeMutex should be read-locked before calling
-func (d *datum) valueStringFromIndex(i int) (s string) {
+func (d *datum) storeValueStringFromIndex(i int) (s string) {
 	if i >= 0 && i < len(d.store) {
 		s = fmt.Sprintf("%v", d.store[i].value)
 	}
@@ -417,11 +417,11 @@ func (d *datum) String() string {
 		d.storeMutex.RLock()
 
 		if l := len(d.store); l > 0 {
-			builder.WriteString(d.valueStringFromIndex(0))
+			builder.WriteString(d.storeValueStringFromIndex(0))
 
 			for l--; l > 0; l-- {
 				builder.WriteByte(' ')
-				builder.WriteString(d.valueStringFromIndex(l))
+				builder.WriteString(d.storeValueStringFromIndex(l))
 			}
 		}
 	}()
