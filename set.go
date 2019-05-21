@@ -48,8 +48,8 @@ func NewFromIntSlice(s []int) (d *datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
-	for i := 0; i < l; i++ {
-		d.addOne(s[i])
+	for l--; l >= 0; l-- {
+		d.addOne(s[l])
 	}
 
 	return
@@ -59,8 +59,8 @@ func NewFromStringSlice(s []string) (d *datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
-	for i := 0; i < l; i++ {
-		d.addOne(s[i])
+	for l--; l >= 0; l-- {
+		d.addOne(s[l])
 	}
 
 	return
