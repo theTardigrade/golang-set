@@ -3,6 +3,7 @@ package set
 import (
 	"fmt"
 	"math/rand"
+	"reflect"
 	"sort"
 	"strings"
 	"time"
@@ -481,29 +482,133 @@ func (d *datum) Reduce(initialValue interface{}, callback ReduceCallback) (accum
 	return
 }
 
-func (d *datum) IntSum() (accumulator int) {
+var (
+	int64Type = reflect.TypeOf(int64(0))
+)
+
+func (d *datum) Int64Sum() (accumulator int64) {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
 	for _, s := range d.store {
-		if value, ok := s.value.(int); ok {
-			accumulator += value
+		var newValue int64
+
+		switch value := s.value.(type) {
+		case int64:
+			newValue = value
+		case int, int8, int16, int32,
+			uint, uint8, uint16, uint32, uint64:
+			{
+				v := reflect.ValueOf(value)
+				v = reflect.Indirect(v)
+
+				if v.Type().ConvertibleTo(int64Type) {
+					newValue = v.Convert(int64Type).Int()
+				}
+			}
+		default:
+			continue
 		}
+
+		accumulator += newValue
 	}
 
 	return
 }
 
-func (d *datum) IntProduct() (accumulator int) {
+func (d *datum) Int64Product() (accumulator int64) {
+	defer d.storeMutex.RUnlock()
+	d.storeMutex.RLock()
+
+	for _, s := range d.store {
+		var newValue int64
+
+		switch value := s.value.(type) {
+		case int64:
+			newValue = value
+		case int, int8, int16, int32,
+			uint, uint8, uint16, uint32, uint64:
+			{
+				v := reflect.ValueOf(value)
+				v = reflect.Indirect(v)
+
+				if v.Type().ConvertibleTo(int64Type) {
+					newValue = v.Convert(int64Type).Int()
+				}
+			}
+		default:
+			continue
+		}
+
+		accumulator *= newValue
+	}
+
+	return
+}
+
+var (
+	float64Type = reflect.TypeOf(float64(0))
+)
+
+func (d *datum) Float64Sum() (accumulator float64) {
+	defer d.storeMutex.RUnlock()
+	d.storeMutex.RLock()
+
+	for _, s := range d.store {
+		var newValue float64
+
+		switch value := s.value.(type) {
+		case float64:
+			newValue = value
+		case float32,
+			int, int8, int16, int32, int64,
+			uint, uint8, uint16, uint32, uint64:
+			{
+				v := reflect.ValueOf(value)
+				v = reflect.Indirect(v)
+
+				if v.Type().ConvertibleTo(float64Type) {
+					newValue = v.Convert(float64Type).Float()
+				}
+			}
+		default:
+			continue
+		}
+
+		accumulator += newValue
+	}
+
+	return
+}
+
+func (d *datum) Float64Product() (accumulator float64) {
 	accumulator = 1
 
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
 	for _, s := range d.store {
-		if value, ok := s.value.(int); ok {
-			accumulator *= value
+		var newValue float64
+
+		switch value := s.value.(type) {
+		case float64:
+			newValue = value
+		case float32,
+			int, int8, int16, int32, int64,
+			uint, uint8, uint16, uint32, uint64:
+			{
+				v := reflect.ValueOf(value)
+				v = reflect.Indirect(v)
+
+				if v.Type().ConvertibleTo(float64Type) {
+					newValue = v.Convert(float64Type).Float()
+				}
+			}
+		default:
+			continue
 		}
+
+		accumulator *= newValue
 	}
 
 	return
