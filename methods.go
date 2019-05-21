@@ -140,7 +140,7 @@ func (d *datum) Clear() {
 	d.cachedHashMutex.Lock()
 	d.storeMutex.Lock()
 
-	d.store = make(InterfaceSlice, 0, cap(d.store))
+	d.store = make([]interface{}, 0, cap(d.store))
 	d.cachedHash = nil
 }
 
@@ -303,11 +303,11 @@ func (d *datum) Hash() uint64 {
 	return d.hash()
 }
 
-func (d *datum) Slice() InterfaceSlice {
+func (d *datum) Slice() []interface{} {
 	defer d.storeMutex.RUnlock()
 	d.storeMutex.RLock()
 
-	return InterfaceSlice(d.store[:])
+	return []interface{}(d.store[:])
 }
 
 func (d *datum) Empty() bool {

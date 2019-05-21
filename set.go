@@ -5,8 +5,6 @@ import (
 	"sync"
 )
 
-type InterfaceSlice []interface{}
-
 type equalityTestFunc (func(interface{}, interface{}) bool)
 
 var (
@@ -14,7 +12,7 @@ var (
 )
 
 type datum struct {
-	store             InterfaceSlice
+	store             []interface{}
 	storeMutex        sync.RWMutex
 	cachedHash        *uint64
 	cachedHashMutex   sync.RWMutex
@@ -31,12 +29,12 @@ func New() *datum {
 func NewWithCapacity(c int) (d *datum) {
 	d = New()
 
-	d.store = make(InterfaceSlice, 0, c)
+	d.store = make([]interface{}, 0, c)
 
 	return
 }
 
-func NewFromSlice(s InterfaceSlice) (d *datum) {
+func NewFromSlice(s []interface{}) (d *datum) {
 	d = NewWithCapacity(len(s))
 
 	d.Add(s...)
