@@ -16,13 +16,13 @@ func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
 		return
 	}
 
-	d.equalityTestMutex.Lock()
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
 	d.equalityTest = equalityTest
-	d.equalityTestMutex.Unlock()
 }
 
-// storeMutex should be locked before calling;
-// equalityTestMutex should be read-locked before calling;
+// mutex should be locked before calling;
 // clearCachedHash method should be called afterwards;
 // s.value should not equal nil
 func (d *datum) addOneFromDatum(s *storeDatum) (success bool) {
@@ -38,8 +38,7 @@ func (d *datum) addOneFromDatum(s *storeDatum) (success bool) {
 	return
 }
 
-// storeMutex should be locked before calling;
-// equalityTestMutex should be read-locked before calling;
+// mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
 func (d *datum) addOne(value interface{}) (success bool) {
 	if value != nil {
@@ -50,24 +49,17 @@ func (d *datum) addOne(value interface{}) (success bool) {
 	return
 }
 
+// mutex should be locked before calling
 func (d *datum) clearCachedHash() {
-	d.cachedHashMutex.Lock()
 	d.cachedHash = nil
-	d.cachedHashMutex.Unlock()
-
-	d.sortedMutex.Lock()
 	d.sorted = false
-	d.sortedMutex.Unlock()
 }
 
 func (d *datum) Add(values ...interface{}) (success bool) {
-	defer d.storeMutex.Unlock()
-	d.storeMutex.Lock()
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
 
 	if l := len(values); l > 0 {
-		defer d.equalityTestMutex.RUnlock()
-		d.equalityTestMutex.RLock()
-
 		for l--; l >= 0; l-- {
 			if d.addOne(values[l]) {
 				success = true
@@ -295,7 +287,7 @@ func (d *datum) AddFromStringSlice(values []string) bool {
 	return d.Add(i...)
 }
 
-// storeMutex should be locked before calling;
+// mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
 func (d *datum) removeOneFromIndex(i int) {
 	if j := len(d.store) - 1; i <= j {
@@ -304,8 +296,7 @@ func (d *datum) removeOneFromIndex(i int) {
 	}
 }
 
-// storeMutex should be locked before calling;
-// equalityTestMutex should be read-locked before calling;
+// mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
 func (d *datum) removeOneFromDatum(s *storeDatum) (success bool) {
 	for i, s2 := range d.store {
@@ -319,8 +310,7 @@ func (d *datum) removeOneFromDatum(s *storeDatum) (success bool) {
 	return
 }
 
-// storeMutex should be locked before calling;
-// equalityTestMutex should be read-locked before calling;
+// mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
 func (d *datum) removeOne(value interface{}) bool {
 	s := newStoreDatum(value)
@@ -328,10 +318,8 @@ func (d *datum) removeOne(value interface{}) bool {
 }
 
 func (d *datum) Remove(values ...interface{}) (success bool) {
-	defer d.equalityTestMutex.RUnlock()
-	defer d.storeMutex.Unlock()
-	d.equalityTestMutex.RLock()
-	d.storeMutex.Lock()
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
 
 	for _, v := range values {
 		if d.removeOne(v) {
@@ -346,12 +334,9 @@ func (d *datum) Remove(values ...interface{}) (success bool) {
 	return
 }
 
-// storeMutex should be read-locked before calling
+// mutex should be read-locked before calling
 func (d *datum) contains(value interface{}) bool {
 	s1 := newStoreDatum(value)
-
-	defer d.equalityTestMutex.RUnlock()
-	d.equalityTestMutex.RLock()
 
 	for _, s2 := range d.store {
 		if d.equalityTest(s1, s2) {
@@ -363,15 +348,15 @@ func (d *datum) contains(value interface{}) bool {
 }
 
 func (d *datum) Contains(value interface{}) bool {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	return d.contains(value)
 }
 
 func (d *datum) Pop() (value interface{}) {
-	defer d.storeMutex.Unlock()
-	d.storeMutex.Lock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	value, index := d.pick()
 	if value != nil {
@@ -382,7 +367,7 @@ func (d *datum) Pop() (value interface{}) {
 	return
 }
 
-// storeMutex should be read-locked before calling
+// mutex should be read-locked before calling
 func (d *datum) pick() (value interface{}, index int) {
 	if l := len(d.store); l > 0 {
 		index = rand.Intn(l)
@@ -393,28 +378,28 @@ func (d *datum) pick() (value interface{}, index int) {
 }
 
 func (d *datum) Pick() (value interface{}) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	value, _ = d.pick()
 
 	return
 }
 
-// storeMutex should be locked before calling
+// mutex should be locked before calling
 func (d *datum) makeStore(capacity int) {
 	d.store = make(storeData, 0, capacity)
 }
 
-// storeMutex should be locked before calling
+// mutex should be locked before calling
 func (d *datum) clear(capacity int) {
 	d.makeStore(capacity)
 	d.clearCachedHash()
 }
 
 func (d *datum) Clear(keepCapacity bool) {
-	defer d.storeMutex.Unlock()
-	d.storeMutex.Lock()
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
 
 	var capacity int
 
@@ -428,8 +413,8 @@ func (d *datum) Clear(keepCapacity bool) {
 type ForEachCallback (func(interface{}))
 
 func (d *datum) ForEach(callback ForEachCallback) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	for _, v := range d.store {
 		callback(v)
@@ -439,8 +424,8 @@ func (d *datum) ForEach(callback ForEachCallback) {
 type MapCallback (func(interface{}) interface{})
 
 func (d *datum) Map(callback MapCallback) {
-	defer d.storeMutex.Unlock()
-	d.storeMutex.Lock()
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
 
 	for i, s := range d.store {
 		d.store[i].value = callback(s.value)
@@ -450,8 +435,8 @@ func (d *datum) Map(callback MapCallback) {
 type FilterCallback (func(interface{}) bool)
 
 func (d *datum) FilterCallback(callback FilterCallback) {
-	defer d.storeMutex.Unlock()
-	d.storeMutex.Lock()
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
 
 	var modified bool
 
@@ -472,8 +457,8 @@ type ReduceCallback (func(interface{}, interface{}) interface{})
 func (d *datum) Reduce(initialValue interface{}, callback ReduceCallback) (accumulator interface{}) {
 	accumulator = initialValue
 
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	for _, v := range d.store {
 		accumulator = callback(accumulator, v)
@@ -487,8 +472,8 @@ var (
 )
 
 func (d *datum) Int64Sum() (accumulator int64) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	for _, s := range d.store {
 		var newValue int64
@@ -514,8 +499,8 @@ func (d *datum) Int64Sum() (accumulator int64) {
 func (d *datum) Int64Product() (accumulator int64) {
 	accumulator = 1
 
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	for _, s := range d.store {
 		var newValue int64
@@ -543,8 +528,8 @@ var (
 )
 
 func (d *datum) Float64Sum() (accumulator float64) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	for _, s := range d.store {
 		var newValue float64
@@ -571,8 +556,8 @@ func (d *datum) Float64Sum() (accumulator float64) {
 func (d *datum) Float64Product() (accumulator float64) {
 	accumulator = 1
 
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	for _, s := range d.store {
 		var newValue float64
@@ -599,8 +584,8 @@ func (d *datum) Float64Product() (accumulator float64) {
 type EveryCallback FilterCallback
 
 func (d *datum) Every(callback EveryCallback) (success bool) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	for _, v := range d.store {
 		if !callback(v) {
@@ -615,8 +600,8 @@ func (d *datum) Every(callback EveryCallback) (success bool) {
 type SomeCallback EveryCallback
 
 func (d *datum) Some(callback SomeCallback) (success bool) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	for _, v := range d.store {
 		if callback(v) {
@@ -633,10 +618,10 @@ func (d *datum) Equal(d2 *datum) bool {
 		return true
 	}
 
-	defer d.storeMutex.RUnlock()
-	defer d2.storeMutex.RUnlock()
-	d.storeMutex.RLock()
-	d2.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	defer d2.mutex.RUnlock()
+	d.mutex.RLock()
+	d2.mutex.RLock()
 
 	l, l2 := len(d.store), len(d2.store)
 
@@ -651,11 +636,8 @@ func (d *datum) Equal(d2 *datum) bool {
 	return d.hash() == d2.hash()
 }
 
-// storeMutex should be read-locked before calling
+// mutex should be locked before calling
 func (d *datum) hash() (value uint64) {
-	defer d.cachedHashMutex.Unlock()
-	d.cachedHashMutex.Lock()
-
 	if d.cachedHash != nil {
 		value = *d.cachedHash
 	} else {
@@ -667,15 +649,15 @@ func (d *datum) hash() (value uint64) {
 }
 
 func (d *datum) Hash() uint64 {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
 
 	return d.hash()
 }
 
 func (d *datum) Slice() (values []interface{}) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	l := len(d.store)
 	values = make([]interface{}, 0, l)
@@ -687,7 +669,7 @@ func (d *datum) Slice() (values []interface{}) {
 	return
 }
 
-// storeMutex should be read-locked before calling
+// mutex should be read-locked before calling
 func (d *datum) storeValueStringFromIndex(i int) (s string) {
 	if i >= 0 && i < len(d.store) {
 		s = fmt.Sprintf("%v", d.store[i].value)
@@ -697,36 +679,30 @@ func (d *datum) storeValueStringFromIndex(i int) (s string) {
 }
 
 func (d *datum) String() string {
-	func() {
-		defer d.sortedMutex.Unlock()
-		d.sortedMutex.Lock()
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
 
+	l := len(d.store)
+
+	if l > 1 {
 		if !d.sorted {
-			defer d.storeMutex.Unlock()
-			d.storeMutex.Lock()
-
 			sort.Sort(d.store)
 			d.sorted = true
 		}
-	}()
+	}
 
 	var builder strings.Builder
 
 	builder.WriteByte('[')
 
-	func() {
-		defer d.storeMutex.RUnlock()
-		d.storeMutex.RLock()
+	if l > 0 {
+		builder.WriteString(d.storeValueStringFromIndex(0))
 
-		if l := len(d.store); l > 0 {
-			builder.WriteString(d.storeValueStringFromIndex(0))
-
-			for l--; l > 0; l-- {
-				builder.WriteByte(' ')
-				builder.WriteString(d.storeValueStringFromIndex(l))
-			}
+		for l--; l > 0; l-- {
+			builder.WriteByte(' ')
+			builder.WriteString(d.storeValueStringFromIndex(l))
 		}
-	}()
+	}
 
 	builder.WriteByte(']')
 
@@ -734,15 +710,15 @@ func (d *datum) String() string {
 }
 
 func (d *datum) Empty() bool {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	return len(d.store) == 0
 }
 
 func (d *datum) Len() (value int) {
-	defer d.storeMutex.RUnlock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	return len(d.store)
 }

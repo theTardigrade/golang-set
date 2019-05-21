@@ -44,19 +44,17 @@ func (s storeData) Swap(i, j int) {
 }
 
 type datum struct {
-	store             storeData
-	storeMutex        sync.RWMutex
-	equalityTest      equalityTestFunc
-	equalityTestMutex sync.RWMutex
-	cachedHash        *uint64
-	cachedHashMutex   sync.RWMutex
-	sorted            bool
-	sortedMutex       sync.Mutex
+	store        storeData
+	equalityTest equalityTestFunc
+	cachedHash   *uint64
+	sorted       bool
+	mutex        sync.RWMutex
 }
 
 func New() *datum {
 	return &datum{
 		equalityTest: defaultEqualityTest,
+		sorted:       true,
 	}
 }
 
@@ -291,12 +289,8 @@ func NewFromComplex128Slice(s []complex128) (d *datum) {
 func Clone(d *datum) (d2 *datum) {
 	d2 = New()
 
-	defer d.equalityTestMutex.RUnlock()
-	defer d.cachedHashMutex.RUnlock()
-	defer d.storeMutex.RUnlock()
-	d.equalityTestMutex.RLock()
-	d.cachedHashMutex.RLock()
-	d.storeMutex.RLock()
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
 
 	d2.store = d.store[:]
 	d2.cachedHash = d.cachedHash
@@ -306,10 +300,10 @@ func Clone(d *datum) (d2 *datum) {
 }
 
 func Union(d1, d2 *datum) (d3 *datum) {
-	defer d1.storeMutex.RUnlock()
-	defer d2.storeMutex.RUnlock()
-	d1.storeMutex.RLock()
-	d2.storeMutex.RLock()
+	defer d1.mutex.RUnlock()
+	defer d2.mutex.RUnlock()
+	d1.mutex.RLock()
+	d2.mutex.RLock()
 
 	d3 = New()
 
@@ -327,10 +321,10 @@ func Union(d1, d2 *datum) (d3 *datum) {
 }
 
 func Intersection(d1, d2 *datum) (d3 *datum) {
-	defer d1.storeMutex.RUnlock()
-	defer d2.storeMutex.RUnlock()
-	d1.storeMutex.RLock()
-	d2.storeMutex.RLock()
+	defer d1.mutex.RUnlock()
+	defer d2.mutex.RUnlock()
+	d1.mutex.RLock()
+	d2.mutex.RLock()
 
 	d3 = New()
 
@@ -348,10 +342,10 @@ func Intersection(d1, d2 *datum) (d3 *datum) {
 }
 
 func Difference(d1, d2 *datum) (d3 *datum) {
-	defer d1.storeMutex.RUnlock()
-	defer d2.storeMutex.RUnlock()
-	d1.storeMutex.RLock()
-	d2.storeMutex.RLock()
+	defer d1.mutex.RUnlock()
+	defer d2.mutex.RUnlock()
+	d1.mutex.RLock()
+	d2.mutex.RLock()
 
 	d3 = New()
 
@@ -365,10 +359,10 @@ func Difference(d1, d2 *datum) (d3 *datum) {
 }
 
 func Subset(d1, d2 *datum) bool {
-	defer d1.storeMutex.RUnlock()
-	defer d2.storeMutex.RUnlock()
-	d1.storeMutex.RLock()
-	d2.storeMutex.RLock()
+	defer d1.mutex.RUnlock()
+	defer d2.mutex.RUnlock()
+	d1.mutex.RLock()
+	d2.mutex.RLock()
 
 	for _, v := range d1.store {
 		if !d2.contains(v) {
