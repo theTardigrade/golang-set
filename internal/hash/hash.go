@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	cacheMaxLen = 1 << 12
+	cacheMaxLen = 1 << 18
 )
 
 type cacheType map[interface{}]uint64
