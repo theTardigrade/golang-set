@@ -35,9 +35,12 @@ func NewWithCapacity(c int) (d *datum) {
 }
 
 func NewFromSlice(s []interface{}) (d *datum) {
-	d = NewWithCapacity(len(s))
+	l := len(s)
+	d = NewWithCapacity(l)
 
-	d.Add(s...)
+	for l--; l >= 0; l-- {
+		d.addOne(s[l])
+	}
 
 	return
 }

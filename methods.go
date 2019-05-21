@@ -48,6 +48,32 @@ func (d *datum) Add(values ...interface{}) {
 	}
 }
 
+func (d *datum) AddFromSlice(values []interface{}) {
+	d.Add(values...)
+}
+
+func (d *datum) AddFromIntSlice(values []int) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.storeMutex.Lock()
+	d.equalityTestMutex.RLock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+}
+
+func (d *datum) AddFromStringSlice(values []string) {
+	defer d.equalityTestMutex.RUnlock()
+	defer d.storeMutex.Unlock()
+	d.storeMutex.Lock()
+	d.equalityTestMutex.RLock()
+
+	for i := len(values) - 1; i >= 0; i-- {
+		d.addOne(values[i])
+	}
+}
+
 // storeMutex should be locked before calling
 func (d *datum) removeOneByIndex(i int) {
 	if j := len(d.store) - 1; i <= j {
