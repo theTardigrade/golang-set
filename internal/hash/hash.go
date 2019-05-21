@@ -24,6 +24,7 @@ func Get(value interface{}) (hashedValue uint64) {
 	defer cacheMutex.Unlock()
 	cacheMutex.Lock()
 
+	// only cache fixed-size primitive types
 	switch value.(type) {
 	case int, int8, int16, int32, int64,
 		uint, uint8, uint16, uint32, uint64,
