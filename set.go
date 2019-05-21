@@ -17,6 +17,7 @@ var (
 type storeDatum struct {
 	value interface{}
 	hash  uint64
+	index *int
 }
 
 func newStoreDatum(value interface{}) *storeDatum {
@@ -24,6 +25,12 @@ func newStoreDatum(value interface{}) *storeDatum {
 		value: value,
 		hash:  hash.Get(value),
 	}
+}
+
+func newStoreDatumWithIndex(value interface{}, index int) *storeDatum {
+	s := newStoreDatum(value)
+	s.index = &index
+	return s
 }
 
 type storeData []*storeDatum

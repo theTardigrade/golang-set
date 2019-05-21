@@ -41,7 +41,8 @@ func (d *datum) addOne(value interface{}) {
 		return
 	}
 
-	d.addOneFromDatum(newStoreDatum(value))
+	s := newStoreDatumWithIndex(value, len(d.store))
+	d.addOneFromDatum(s)
 }
 
 func (d *datum) clearCachedHash() {
@@ -118,7 +119,8 @@ func (d *datum) removeOneFromDatum(s *storeDatum) {
 // equalityTestMutex should be read-locked before calling;
 // clearCachedHash method should be called afterwards
 func (d *datum) removeOne(value interface{}) {
-	d.removeOneFromDatum(newStoreDatum(value))
+	s := newStoreDatum(value)
+	d.removeOneFromDatum(s)
 }
 
 func (d *datum) Remove(values ...interface{}) {
