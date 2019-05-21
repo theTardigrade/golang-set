@@ -18,7 +18,8 @@ func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
 }
 
 // storeMutex should be locked before calling;
-// equalityTestMutex should be read-locked before calling
+// equalityTestMutex should be read-locked before calling;
+// clearCachedHash method should be called afterwards
 func (d *datum) addOne(value interface{}) {
 	if value == nil {
 		return
