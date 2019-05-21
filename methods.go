@@ -11,7 +11,7 @@ import (
 
 func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) {
 	if equalityTest == nil {
-		equalityTest = defaultEqualityTest
+		return
 	}
 
 	d.equalityTestMutex.Lock()
