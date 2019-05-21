@@ -31,7 +31,9 @@ func (d *datum) addOne(value interface{}) {
 	}
 
 	d.store = append(d.store, value)
+}
 
+func (d *datum) clearCachedHash() {
 	d.cachedHashMutex.Lock()
 	d.cachedHash = nil
 	d.cachedHashMutex.Unlock()
@@ -46,6 +48,8 @@ func (d *datum) Add(values ...interface{}) {
 	for _, v := range values {
 		d.addOne(v)
 	}
+
+	d.clearCachedHash()
 }
 
 func (d *datum) AddFromSlice(values []interface{}) {
@@ -61,6 +65,8 @@ func (d *datum) AddFromIntSlice(values []int) {
 	for i := len(values) - 1; i >= 0; i-- {
 		d.addOne(values[i])
 	}
+
+	d.clearCachedHash()
 }
 
 func (d *datum) AddFromStringSlice(values []string) {
@@ -72,6 +78,8 @@ func (d *datum) AddFromStringSlice(values []string) {
 	for i := len(values) - 1; i >= 0; i-- {
 		d.addOne(values[i])
 	}
+
+	d.clearCachedHash()
 }
 
 // storeMutex should be locked before calling
