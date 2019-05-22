@@ -1,6 +1,11 @@
 package set
 
 // mutex should be locked before calling
+func (d *datum) makeStore(capacity int) {
+	d.store = make(storeData, 0, capacity)
+}
+
+// mutex should be locked before calling
 func (d *datum) clearCachedHash() {
 	d.cachedHash = nil
 	d.sorted = false

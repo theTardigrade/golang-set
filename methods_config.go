@@ -34,7 +34,32 @@ func (d *datum) SetMaximumValueCount(n int) (success bool) {
 	return
 }
 
-// mutex should be locked before calling
-func (d *datum) makeStore(capacity int) {
-	d.store = make(storeData, 0, capacity)
+func (d *datum) SetFilter(f filterFunc) (success bool) {
+	if f == nil {
+		return
+	}
+
+	success = true
+
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
+	d.filter = f
+
+	if l := len(d.store); l > 0 {
+		var modified bool
+
+		for i, s := range d.store {
+			if !f(s.value) {
+				d.removeOneFromIndex(i)
+				modified = true
+			}
+		}
+
+		if modified {
+			d.clearCachedHash()
+		}
+	}
+
+	return
 }

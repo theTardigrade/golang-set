@@ -14,6 +14,12 @@ func (d *datum) addOneFromDatum(s *storeDatum) (success bool) {
 		}
 	}
 
+	if f := d.filter; f != nil {
+		if !f(s.value) {
+			return
+		}
+	}
+
 	for _, s2 := range d.store {
 		if d.equalityTest(s, s2) {
 			return

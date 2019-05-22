@@ -4,7 +4,10 @@ import (
 	"sync"
 )
 
-type equalityTestFunc (func(*storeDatum, *storeDatum) bool)
+type (
+	filterFunc       FilterCallback
+	equalityTestFunc (func(*storeDatum, *storeDatum) bool)
+)
 
 var (
 	defaultEqualityTest equalityTestFunc = func(d1, d2 *storeDatum) bool {
@@ -33,6 +36,7 @@ type datum struct {
 	equalityTest      equalityTestFunc
 	cachedHash        *uint64
 	maximumValueCount *int
+	filter            filterFunc
 	sorted            bool
 	mutex             sync.RWMutex
 }

@@ -8,8 +8,8 @@ func (d *datum) ForEach(callback ForEachCallback) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
-	for _, v := range d.store {
-		callback(v)
+	for _, s := range d.store {
+		callback(s.value)
 	}
 }
 
@@ -26,14 +26,14 @@ func (d *datum) Map(callback MapCallback) {
 
 type FilterCallback (func(interface{}) bool)
 
-func (d *datum) FilterCallback(callback FilterCallback) {
+func (d *datum) Filter(callback FilterCallback) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
 	var modified bool
 
-	for i, v := range d.store {
-		if !callback(v) {
+	for i, s := range d.store {
+		if !callback(s.value) {
 			d.removeOneFromIndex(i)
 			modified = true
 		}
@@ -52,8 +52,8 @@ func (d *datum) Reduce(initialValue interface{}, callback ReduceCallback) (accum
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
-	for _, v := range d.store {
-		accumulator = callback(accumulator, v)
+	for _, s := range d.store {
+		accumulator = callback(accumulator, s.value)
 	}
 
 	return
@@ -179,8 +179,8 @@ func (d *datum) Every(callback EveryCallback) (success bool) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
-	for _, v := range d.store {
-		if !callback(v) {
+	for _, s := range d.store {
+		if !callback(s.value) {
 			return
 		}
 	}
@@ -195,8 +195,8 @@ func (d *datum) Some(callback SomeCallback) (success bool) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
-	for _, v := range d.store {
-		if callback(v) {
+	for _, s := range d.store {
+		if callback(s.value) {
 			success = true
 			break
 		}
