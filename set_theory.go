@@ -29,13 +29,13 @@ func Intersection(d1, d2 *datum) (d3 *datum) {
 
 	d3 = New()
 
-	if len(d2.store) > len(d1.store) {
+	if len(d2.store) < len(d1.store) {
 		d2, d1 = d1, d2
 	}
 
-	for _, v := range d1.store {
-		if d2.contains(v) {
-			d3.addOne(v)
+	for _, s := range d1.store {
+		if d2.contains(s.Value) {
+			d3.addOneFromDatum(s)
 		}
 	}
 
@@ -50,9 +50,9 @@ func Difference(d1, d2 *datum) (d3 *datum) {
 
 	d3 = New()
 
-	for _, v := range d1.store {
-		if !d2.contains(v) {
-			d3.addOne(v)
+	for _, s := range d1.store {
+		if !d2.contains(s.Value) {
+			d3.addOneFromDatum(s)
 		}
 	}
 
@@ -65,8 +65,8 @@ func Subset(d1, d2 *datum) bool {
 	d1.mutex.RLock()
 	d2.mutex.RLock()
 
-	for _, v := range d1.store {
-		if !d2.contains(v) {
+	for _, s := range d1.store {
+		if !d2.contains(s.Value) {
 			return false
 		}
 	}
