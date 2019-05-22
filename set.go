@@ -1,6 +1,7 @@
 package set
 
 import (
+	"reflect"
 	"sync"
 )
 
@@ -10,8 +11,12 @@ type (
 )
 
 var (
-	defaultEqualityTest equalityTestFunc = func(d1, d2 *StoreDatum) bool {
-		return d1.Hash == d2.Hash
+	DefaultEqualityTest equalityTestFunc = func(s1, s2 *StoreDatum) bool {
+		if s1.Hash != s2.Hash {
+			return false
+		}
+
+		return reflect.DeepEqual(s1.Value, s2.Value)
 	}
 )
 

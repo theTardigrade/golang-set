@@ -1,7 +1,7 @@
 package set
 
 func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
-	if equalityTest != nil {
+	if equalityTest == nil {
 		return
 	}
 
@@ -12,21 +12,19 @@ func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
 
 	d.equalityTest = equalityTest
 
-	// if s := d.store; s != nil {
-	// 	if l := len(s); l > 0 {
-	// 		for i := 0; i < l; i++ {
-	// 			for j := i; j < l; j++ {
-	// 				if i == j {
-	// 					continue
-	// 				}
-
-	// 				if equalityTest(s[i], s[j]) {
-	// 					return
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
+	if s := d.store; s != nil {
+		if l := len(s); l > 0 {
+			for i := 0; i < l; i++ {
+				for j := i + 1; j < l; j++ {
+					if equalityTest(s[i], s[j]) {
+						d.removeOneFromIndex(j)
+						l--
+						j--
+					}
+				}
+			}
+		}
+	}
 
 	return
 }
