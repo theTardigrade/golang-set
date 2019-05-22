@@ -1,6 +1,6 @@
 package set
 
-func Union(d1, d2 *datum) (d3 *datum) {
+func Union(d1, d2 *Datum) (d3 *Datum) {
 	d3 = New()
 
 	defer d1.mutex.RUnlock()
@@ -21,7 +21,7 @@ func Union(d1, d2 *datum) (d3 *datum) {
 	return
 }
 
-func Intersection(d1, d2 *datum) (d3 *datum) {
+func Intersection(d1, d2 *Datum) (d3 *Datum) {
 	d3 = New()
 
 	defer d1.mutex.RUnlock()
@@ -44,7 +44,7 @@ func Intersection(d1, d2 *datum) (d3 *datum) {
 	return
 }
 
-func Difference(d1, d2 *datum) (d3 *datum) {
+func Difference(d1, d2 *Datum) (d3 *Datum) {
 	d3 = New()
 
 	defer d1.mutex.RUnlock()
@@ -63,7 +63,7 @@ func Difference(d1, d2 *datum) (d3 *datum) {
 	return
 }
 
-func Subset(d1, d2 *datum) (success bool) {
+func Subset(d1, d2 *Datum) (success bool) {
 	defer d1.mutex.RUnlock()
 	defer d2.mutex.RUnlock()
 	d1.mutex.RLock()

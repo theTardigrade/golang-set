@@ -1,7 +1,7 @@
 package set
 
 // mutex should be read-locked before calling
-func (d *datum) containsFromDatum(s *StoreDatum) (success bool) {
+func (d *Datum) containsFromDatum(s *StoreDatum) (success bool) {
 	for _, s2 := range d.store {
 		if d.equalityTest(s, s2) {
 			success = true
@@ -13,19 +13,19 @@ func (d *datum) containsFromDatum(s *StoreDatum) (success bool) {
 }
 
 // mutex should be read-locked before calling
-func (d *datum) contains(value interface{}) bool {
+func (d *Datum) contains(value interface{}) bool {
 	s1 := newStoreDatum(value)
 	return d.containsFromDatum(s1)
 }
 
-func (d *datum) Contains(value interface{}) bool {
+func (d *Datum) Contains(value interface{}) bool {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
 	return d.contains(value)
 }
 
-func (d *datum) ContainsEvery(values ...interface{}) (success bool) {
+func (d *Datum) ContainsEvery(values ...interface{}) (success bool) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -39,7 +39,7 @@ func (d *datum) ContainsEvery(values ...interface{}) (success bool) {
 	return
 }
 
-func (d *datum) ContainsSome(values ...interface{}) (success bool) {
+func (d *Datum) ContainsSome(values ...interface{}) (success bool) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 

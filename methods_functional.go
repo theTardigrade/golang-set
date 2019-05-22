@@ -4,7 +4,7 @@ import "reflect"
 
 type forEachCallback (func(interface{}))
 
-func (d *datum) ForEach(callback forEachCallback) {
+func (d *Datum) ForEach(callback forEachCallback) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -15,7 +15,7 @@ func (d *datum) ForEach(callback forEachCallback) {
 
 type mapCallback (func(interface{}) interface{})
 
-func (d *datum) Map(callback mapCallback) {
+func (d *Datum) Map(callback mapCallback) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
@@ -26,7 +26,7 @@ func (d *datum) Map(callback mapCallback) {
 
 type filterCallback (func(interface{}) bool)
 
-func (d *datum) Filter(callback filterCallback) {
+func (d *Datum) Filter(callback filterCallback) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
@@ -46,7 +46,7 @@ func (d *datum) Filter(callback filterCallback) {
 
 type reduceCallback (func(interface{}, interface{}) interface{})
 
-func (d *datum) Reduce(initialValue interface{}, callback reduceCallback) (accumulator interface{}) {
+func (d *Datum) Reduce(initialValue interface{}, callback reduceCallback) (accumulator interface{}) {
 	accumulator = initialValue
 
 	defer d.mutex.RUnlock()
@@ -63,7 +63,7 @@ var (
 	int64Type = reflect.TypeOf(int64(0))
 )
 
-func (d *datum) Int64Sum() (accumulator int64) {
+func (d *Datum) Int64Sum() (accumulator int64) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -88,7 +88,7 @@ func (d *datum) Int64Sum() (accumulator int64) {
 	return
 }
 
-func (d *datum) Int64Product() (accumulator int64) {
+func (d *Datum) Int64Product() (accumulator int64) {
 	accumulator = 1
 
 	defer d.mutex.RUnlock()
@@ -119,7 +119,7 @@ var (
 	float64Type = reflect.TypeOf(float64(0))
 )
 
-func (d *datum) Float64Sum() (accumulator float64) {
+func (d *Datum) Float64Sum() (accumulator float64) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -145,7 +145,7 @@ func (d *datum) Float64Sum() (accumulator float64) {
 	return
 }
 
-func (d *datum) Float64Product() (accumulator float64) {
+func (d *Datum) Float64Product() (accumulator float64) {
 	accumulator = 1
 
 	defer d.mutex.RUnlock()
@@ -175,7 +175,7 @@ func (d *datum) Float64Product() (accumulator float64) {
 
 type everyCallback filterCallback
 
-func (d *datum) Every(callback everyCallback) (success bool) {
+func (d *Datum) Every(callback everyCallback) (success bool) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -191,7 +191,7 @@ func (d *datum) Every(callback everyCallback) (success bool) {
 
 type someCallback filterCallback
 
-func (d *datum) Some(callback someCallback) (success bool) {
+func (d *Datum) Some(callback someCallback) (success bool) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 

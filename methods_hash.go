@@ -5,7 +5,7 @@ import (
 )
 
 // mutex should be locked before calling
-func (d *datum) hash() (value uint64) {
+func (d *Datum) hash() (value uint64) {
 	if d.cachedHash != nil {
 		value = *d.cachedHash
 	} else {
@@ -16,7 +16,7 @@ func (d *datum) hash() (value uint64) {
 	return
 }
 
-func (d *datum) Hash() uint64 {
+func (d *Datum) Hash() uint64 {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 

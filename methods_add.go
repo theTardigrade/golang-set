@@ -3,7 +3,7 @@ package set
 // mutex should be locked before calling;
 // clearCachedHash method should be called afterwards;
 // s.Value should not equal nil
-func (d *datum) addOneFromDatum(s *StoreDatum) (success bool) {
+func (d *Datum) addOneFromDatum(s *StoreDatum) (success bool) {
 	if m := d.maximumValueCount; m != nil {
 		if l, n := len(d.store), *m; l >= n {
 			if l > n {
@@ -39,7 +39,7 @@ func (d *datum) addOneFromDatum(s *StoreDatum) (success bool) {
 
 // mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
-func (d *datum) addOne(value interface{}) (success bool) {
+func (d *Datum) addOne(value interface{}) (success bool) {
 	if value != nil {
 		s := newStoreDatumWithIndex(value, len(d.store))
 		success = d.addOneFromDatum(s)
@@ -48,7 +48,7 @@ func (d *datum) addOne(value interface{}) (success bool) {
 	return
 }
 
-func (d *datum) Add(values ...interface{}) (success bool) {
+func (d *Datum) Add(values ...interface{}) (success bool) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
@@ -67,11 +67,11 @@ func (d *datum) Add(values ...interface{}) (success bool) {
 	return
 }
 
-func (d *datum) AddFromSlice(values []interface{}) {
+func (d *Datum) AddFromSlice(values []interface{}) {
 	d.Add(values...)
 }
 
-func (d *datum) AddFromIntSlice(values []int) bool {
+func (d *Datum) AddFromIntSlice(values []int) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -82,7 +82,7 @@ func (d *datum) AddFromIntSlice(values []int) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromInt8Slice(values []int8) bool {
+func (d *Datum) AddFromInt8Slice(values []int8) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -93,7 +93,7 @@ func (d *datum) AddFromInt8Slice(values []int8) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromInt16Slice(values []int16) bool {
+func (d *Datum) AddFromInt16Slice(values []int16) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -104,7 +104,7 @@ func (d *datum) AddFromInt16Slice(values []int16) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromInt32Slice(values []int32) bool {
+func (d *Datum) AddFromInt32Slice(values []int32) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -115,7 +115,7 @@ func (d *datum) AddFromInt32Slice(values []int32) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromInt64Slice(values []int64) bool {
+func (d *Datum) AddFromInt64Slice(values []int64) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -126,7 +126,7 @@ func (d *datum) AddFromInt64Slice(values []int64) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromUintSlice(values []uint) bool {
+func (d *Datum) AddFromUintSlice(values []uint) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -137,7 +137,7 @@ func (d *datum) AddFromUintSlice(values []uint) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromUint8Slice(values []uint8) bool {
+func (d *Datum) AddFromUint8Slice(values []uint8) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -148,7 +148,7 @@ func (d *datum) AddFromUint8Slice(values []uint8) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromUint16Slice(values []uint16) bool {
+func (d *Datum) AddFromUint16Slice(values []uint16) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -159,7 +159,7 @@ func (d *datum) AddFromUint16Slice(values []uint16) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromUint32Slice(values []uint32) bool {
+func (d *Datum) AddFromUint32Slice(values []uint32) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -170,7 +170,7 @@ func (d *datum) AddFromUint32Slice(values []uint32) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromUint64Slice(values []uint64) bool {
+func (d *Datum) AddFromUint64Slice(values []uint64) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -181,7 +181,7 @@ func (d *datum) AddFromUint64Slice(values []uint64) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromUinptrSlice(values []uintptr) bool {
+func (d *Datum) AddFromUinptrSlice(values []uintptr) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -192,7 +192,7 @@ func (d *datum) AddFromUinptrSlice(values []uintptr) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromFloat32Slice(values []float32) bool {
+func (d *Datum) AddFromFloat32Slice(values []float32) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -203,7 +203,7 @@ func (d *datum) AddFromFloat32Slice(values []float32) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromFloat64Slice(values []float64) bool {
+func (d *Datum) AddFromFloat64Slice(values []float64) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -214,7 +214,7 @@ func (d *datum) AddFromFloat64Slice(values []float64) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromComplex64Slice(values []complex64) bool {
+func (d *Datum) AddFromComplex64Slice(values []complex64) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -225,7 +225,7 @@ func (d *datum) AddFromComplex64Slice(values []complex64) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromComplex128Slice(values []complex128) bool {
+func (d *Datum) AddFromComplex128Slice(values []complex128) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -236,7 +236,7 @@ func (d *datum) AddFromComplex128Slice(values []complex128) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromByteSlice(values []byte) bool {
+func (d *Datum) AddFromByteSlice(values []byte) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -247,7 +247,7 @@ func (d *datum) AddFromByteSlice(values []byte) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromRuneSlice(values []rune) bool {
+func (d *Datum) AddFromRuneSlice(values []rune) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -258,7 +258,7 @@ func (d *datum) AddFromRuneSlice(values []rune) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromBoolSlice(values []bool) bool {
+func (d *Datum) AddFromBoolSlice(values []bool) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 
@@ -269,7 +269,7 @@ func (d *datum) AddFromBoolSlice(values []bool) bool {
 	return d.Add(i...)
 }
 
-func (d *datum) AddFromStringSlice(values []string) bool {
+func (d *Datum) AddFromStringSlice(values []string) bool {
 	l := len(values)
 	i := make([]interface{}, l)
 

@@ -1,13 +1,13 @@
 package set
 
-func (d *datum) copyConfig(d2 *datum) {
+func (d *Datum) copyConfig(d2 *Datum) {
 	d.equalityTest = d2.equalityTest
 	d.maximumValueCount = d2.maximumValueCount
 	d.filter = d2.filter
 	d.multiMode = d2.multiMode
 }
 
-func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
+func (d *Datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
 	if equalityTest == nil {
 		return
 	}
@@ -23,7 +23,7 @@ func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
 	return
 }
 
-func (d *datum) SetMaximumValueCount(n int) (success bool) {
+func (d *Datum) SetMaximumValueCount(n int) (success bool) {
 	if n < 0 {
 		return
 	}
@@ -44,7 +44,7 @@ func (d *datum) SetMaximumValueCount(n int) (success bool) {
 	return
 }
 
-func (d *datum) SetFilter(f filterFunc) (success bool) {
+func (d *Datum) SetFilter(f filterFunc) (success bool) {
 	if f == nil {
 		return
 	}
@@ -76,7 +76,7 @@ func (d *datum) SetFilter(f filterFunc) (success bool) {
 	return
 }
 
-func (d *datum) SetMultiMode(multiMode bool) {
+func (d *Datum) SetMultiMode(multiMode bool) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 

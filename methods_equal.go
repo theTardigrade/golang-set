@@ -1,6 +1,6 @@
 package set
 
-func (d *datum) Equal(d2 *datum) bool {
+func (d *Datum) Equal(d2 *Datum) bool {
 	if d2 == d {
 		return true
 	}

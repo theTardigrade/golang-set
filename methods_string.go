@@ -7,7 +7,7 @@ import (
 )
 
 // mutex should be read-locked before calling
-func (d *datum) storeValueStringFromIndex(i int) (s string) {
+func (d *Datum) storeValueStringFromIndex(i int) (s string) {
 	if i >= 0 && i < len(d.store) {
 		s = fmt.Sprintf("%v", d.store[i].Value)
 	}
@@ -15,7 +15,7 @@ func (d *datum) storeValueStringFromIndex(i int) (s string) {
 	return
 }
 
-func (d *datum) String() string {
+func (d *Datum) String() string {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 

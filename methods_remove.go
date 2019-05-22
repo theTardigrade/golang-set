@@ -1,7 +1,7 @@
 package set
 
 // mutex should be locked before calling
-func (d *datum) removeDuplicates() (success bool) {
+func (d *Datum) removeDuplicates() (success bool) {
 	if s := d.store; s != nil {
 		if l := len(s); l > 0 {
 			for i := 0; i < l; i++ {
@@ -29,7 +29,7 @@ func (d *datum) removeDuplicates() (success bool) {
 
 // mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
-func (d *datum) removeOneFromIndex(i int) {
+func (d *Datum) removeOneFromIndex(i int) {
 	if j := len(d.store) - 1; i <= j {
 		s := d.store[i]
 		if d.multiMode {
@@ -45,7 +45,7 @@ func (d *datum) removeOneFromIndex(i int) {
 
 // mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
-func (d *datum) removeOneFromDatum(s *StoreDatum) (success bool) {
+func (d *Datum) removeOneFromDatum(s *StoreDatum) (success bool) {
 	for i, s2 := range d.store {
 		if d.equalityTest(s, s2) {
 			d.removeOneFromIndex(i)
@@ -59,12 +59,12 @@ func (d *datum) removeOneFromDatum(s *StoreDatum) (success bool) {
 
 // mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
-func (d *datum) removeOne(value interface{}) bool {
+func (d *Datum) removeOne(value interface{}) bool {
 	s := newStoreDatum(value)
 	return d.removeOneFromDatum(s)
 }
 
-func (d *datum) Remove(values ...interface{}) (success bool) {
+func (d *Datum) Remove(values ...interface{}) (success bool) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 

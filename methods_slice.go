@@ -1,6 +1,6 @@
 package set
 
-func (d *datum) Slice() (values []interface{}) {
+func (d *Datum) Slice() (values []interface{}) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 

@@ -1,6 +1,6 @@
 package set
 
-func Clone(d *datum) (d2 *datum) {
+func Clone(d *Datum) (d2 *Datum) {
 	d2 = New()
 
 	defer d.mutex.RUnlock()

@@ -37,7 +37,7 @@ func (s storeData) Swap(i, j int) {
 	s[i], s[j] = sJ, sI
 }
 
-type datum struct {
+type Datum struct {
 	store             storeData
 	equalityTest      equalityTestFunc
 	cachedHash        *uint64

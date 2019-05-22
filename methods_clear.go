@@ -1,23 +1,23 @@
 package set
 
 // mutex should be locked before calling
-func (d *datum) makeStore(capacity int) {
+func (d *Datum) makeStore(capacity int) {
 	d.store = make(storeData, 0, capacity)
 }
 
 // mutex should be locked before calling
-func (d *datum) clearCachedHash() {
+func (d *Datum) clearCachedHash() {
 	d.cachedHash = nil
 	d.sorted = false
 }
 
 // mutex should be locked before calling
-func (d *datum) clear(capacity int) {
+func (d *Datum) clear(capacity int) {
 	d.makeStore(capacity)
 	d.clearCachedHash()
 }
 
-func (d *datum) Clear(keepCapacity bool) {
+func (d *Datum) Clear(keepCapacity bool) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 

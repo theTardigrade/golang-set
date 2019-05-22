@@ -1,6 +1,6 @@
 package set
 
-func (d *datum) Union(d2 *datum) {
+func (d *Datum) Union(d2 *Datum) {
 	var modified bool
 
 	defer d2.mutex.RUnlock()
@@ -19,7 +19,7 @@ func (d *datum) Union(d2 *datum) {
 	}
 }
 
-func (d *datum) Intersection(d2 *datum) {
+func (d *Datum) Intersection(d2 *Datum) {
 	var modified bool
 
 	defer d2.mutex.RUnlock()
@@ -40,7 +40,7 @@ func (d *datum) Intersection(d2 *datum) {
 	}
 }
 
-func (d *datum) Difference(d2 *datum) {
+func (d *Datum) Difference(d2 *Datum) {
 	var data storeData
 
 	defer d2.mutex.RUnlock()
@@ -58,6 +58,6 @@ func (d *datum) Difference(d2 *datum) {
 	d.clearCachedHash()
 }
 
-func (d *datum) Subset(d2 *datum) bool {
+func (d *Datum) Subset(d2 *Datum) bool {
 	return Subset(d, d2)
 }

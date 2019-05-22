@@ -1,7 +1,7 @@
 package set
 
 // mutex should be read-locked before calling
-func (d *datum) instancesFromDatum(s *StoreDatum) (n int) {
+func (d *Datum) instancesFromDatum(s *StoreDatum) (n int) {
 	if d.multiMode {
 		for _, s2 := range d.store {
 			if d.equalityTest(s, s2) {
@@ -17,12 +17,12 @@ func (d *datum) instancesFromDatum(s *StoreDatum) (n int) {
 }
 
 // mutex should be read-locked before calling
-func (d *datum) instances(value interface{}) int {
+func (d *Datum) instances(value interface{}) int {
 	s1 := newStoreDatum(value)
 	return d.instancesFromDatum(s1)
 }
 
-func (d *datum) Instances(value interface{}) int {
+func (d *Datum) Instances(value interface{}) int {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 

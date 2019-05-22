@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func (d *datum) Pop() (value interface{}) {
+func (d *Datum) Pop() (value interface{}) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -19,7 +19,7 @@ func (d *datum) Pop() (value interface{}) {
 }
 
 // mutex should be read-locked before calling
-func (d *datum) pick() (value interface{}, index int) {
+func (d *Datum) pick() (value interface{}, index int) {
 	if l := len(d.store); l > 0 {
 		index = rand.Intn(l)
 		value = d.store[index]
@@ -28,7 +28,7 @@ func (d *datum) pick() (value interface{}, index int) {
 	return
 }
 
-func (d *datum) Pick() (value interface{}) {
+func (d *Datum) Pick() (value interface{}) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 

@@ -1,6 +1,6 @@
 package set
 
-func (d *datum) Len(includeInstances bool) (value int) {
+func (d *Datum) Len(includeInstances bool) (value int) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -15,7 +15,14 @@ func (d *datum) Len(includeInstances bool) (value int) {
 	return
 }
 
-func (d *datum) Empty() bool {
+func (d *Datum) Cap() int {
+	defer d.mutex.RUnlock()
+	d.mutex.RLock()
+
+	return cap(d.store)
+}
+
+func (d *Datum) Empty() bool {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 

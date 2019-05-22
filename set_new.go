@@ -18,13 +18,13 @@ func newStoreDatumWithIndex(value interface{}, index int) *StoreDatum {
 	return s
 }
 
-func New() *datum {
-	return &datum{
+func New() *Datum {
+	return &Datum{
 		equalityTest: DefaultEqualityTest,
 	}
 }
 
-func NewWithCapacity(c int) (d *datum) {
+func NewWithCapacity(c int) (d *Datum) {
 	d = New()
 
 	d.makeStore(c)
@@ -32,7 +32,7 @@ func NewWithCapacity(c int) (d *datum) {
 	return
 }
 
-func NewFromSlice(s []interface{}) (d *datum) {
+func NewFromSlice(s []interface{}) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -43,7 +43,7 @@ func NewFromSlice(s []interface{}) (d *datum) {
 	return
 }
 
-func NewFromBoolSlice(s []bool) (d *datum) {
+func NewFromBoolSlice(s []bool) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -54,7 +54,7 @@ func NewFromBoolSlice(s []bool) (d *datum) {
 	return
 }
 
-func NewFromInt8Slice(s []int8) (d *datum) {
+func NewFromInt8Slice(s []int8) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -65,7 +65,7 @@ func NewFromInt8Slice(s []int8) (d *datum) {
 	return
 }
 
-func NewFromInt16Slice(s []int16) (d *datum) {
+func NewFromInt16Slice(s []int16) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -76,7 +76,7 @@ func NewFromInt16Slice(s []int16) (d *datum) {
 	return
 }
 
-func NewFromInt32Slice(s []int32) (d *datum) {
+func NewFromInt32Slice(s []int32) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -87,7 +87,7 @@ func NewFromInt32Slice(s []int32) (d *datum) {
 	return
 }
 
-func NewFromInt64Slice(s []int64) (d *datum) {
+func NewFromInt64Slice(s []int64) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -98,7 +98,7 @@ func NewFromInt64Slice(s []int64) (d *datum) {
 	return
 }
 
-func NewFromIntSlice(s []int) (d *datum) {
+func NewFromIntSlice(s []int) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -109,7 +109,7 @@ func NewFromIntSlice(s []int) (d *datum) {
 	return
 }
 
-func NewFromUint8Slice(s []uint8) (d *datum) {
+func NewFromUint8Slice(s []uint8) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -120,7 +120,7 @@ func NewFromUint8Slice(s []uint8) (d *datum) {
 	return
 }
 
-func NewFromUint16Slice(s []uint16) (d *datum) {
+func NewFromUint16Slice(s []uint16) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -131,7 +131,7 @@ func NewFromUint16Slice(s []uint16) (d *datum) {
 	return
 }
 
-func NewFromUint32Slice(s []uint32) (d *datum) {
+func NewFromUint32Slice(s []uint32) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -142,7 +142,7 @@ func NewFromUint32Slice(s []uint32) (d *datum) {
 	return
 }
 
-func NewFromUint64Slice(s []uint64) (d *datum) {
+func NewFromUint64Slice(s []uint64) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -153,7 +153,7 @@ func NewFromUint64Slice(s []uint64) (d *datum) {
 	return
 }
 
-func NewFromUintSlice(s []uint) (d *datum) {
+func NewFromUintSlice(s []uint) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -164,7 +164,7 @@ func NewFromUintSlice(s []uint) (d *datum) {
 	return
 }
 
-func NewFromUintptrSlice(s []uintptr) (d *datum) {
+func NewFromUintptrSlice(s []uintptr) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -175,7 +175,7 @@ func NewFromUintptrSlice(s []uintptr) (d *datum) {
 	return
 }
 
-func NewFromStringSlice(s []string) (d *datum) {
+func NewFromStringSlice(s []string) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -186,7 +186,7 @@ func NewFromStringSlice(s []string) (d *datum) {
 	return
 }
 
-func NewFromByteSlice(s []byte) (d *datum) {
+func NewFromByteSlice(s []byte) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -197,7 +197,7 @@ func NewFromByteSlice(s []byte) (d *datum) {
 	return
 }
 
-func NewFromRuneSlice(s []rune) (d *datum) {
+func NewFromRuneSlice(s []rune) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -208,7 +208,7 @@ func NewFromRuneSlice(s []rune) (d *datum) {
 	return
 }
 
-func NewFromFloat32Slice(s []float32) (d *datum) {
+func NewFromFloat32Slice(s []float32) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -219,7 +219,7 @@ func NewFromFloat32Slice(s []float32) (d *datum) {
 	return
 }
 
-func NewFromFloat64Slice(s []float64) (d *datum) {
+func NewFromFloat64Slice(s []float64) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -230,7 +230,7 @@ func NewFromFloat64Slice(s []float64) (d *datum) {
 	return
 }
 
-func NewFromComplex64Slice(s []complex64) (d *datum) {
+func NewFromComplex64Slice(s []complex64) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 
@@ -241,7 +241,7 @@ func NewFromComplex64Slice(s []complex64) (d *datum) {
 	return
 }
 
-func NewFromComplex128Slice(s []complex128) (d *datum) {
+func NewFromComplex128Slice(s []complex128) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)
 

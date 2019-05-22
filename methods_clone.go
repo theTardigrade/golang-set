@@ -1,5 +1,5 @@
 package set
 
-func (d *datum) Clone() *datum {
+func (d *Datum) Clone() *Datum {
 	return Clone(d)
 }
