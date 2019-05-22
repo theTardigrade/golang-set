@@ -27,8 +27,10 @@ func (d *datum) SetMaximumValueCount(n int) (success bool) {
 
 	d.maximumValueCount = &n
 
-	if l := len(d.store); l > n {
-		d.store = d.store[:n]
+	if s := d.store; s != nil {
+		if l := len(s); l > n {
+			d.store = s[:n]
+		}
 	}
 
 	return
@@ -46,18 +48,20 @@ func (d *datum) SetFilter(f filterFunc) (success bool) {
 
 	d.filter = f
 
-	if l := len(d.store); l > 0 {
-		var modified bool
+	if s := d.store; s != nil {
+		if l := len(d.store); l > 0 {
+			var modified bool
 
-		for i, s := range d.store {
-			if !f(s.value) {
-				d.removeOneFromIndex(i)
-				modified = true
+			for l--; l >= 0; l-- {
+				if v := s[l].value; !f(v) {
+					d.removeOneFromIndex(l)
+					modified = true
+				}
 			}
-		}
 
-		if modified {
-			d.clearCachedHash()
+			if modified {
+				d.clearCachedHash()
+			}
 		}
 	}
 
