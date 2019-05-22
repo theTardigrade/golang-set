@@ -1,6 +1,8 @@
 package set
 
-import "github.com/theTardigrade/set/internal/hash"
+import (
+	"github.com/theTardigrade/set/internal/hash"
+)
 
 // mutex should be locked before calling
 func (d *datum) hash() (value uint64) {
@@ -18,5 +20,5 @@ func (d *datum) Hash() uint64 {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
-	return d.Hash()
+	return d.hash()
 }
