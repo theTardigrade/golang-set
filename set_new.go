@@ -20,7 +20,6 @@ func newStoreDatumWithIndex(value interface{}, index int) *StoreDatum {
 func New() *datum {
 	return &datum{
 		equalityTest: DefaultEqualityTest,
-		sorted:       true,
 	}
 }
 

@@ -1,5 +1,11 @@
 package set
 
+func (d *datum) copyConfig(d2 *datum) {
+	d.equalityTest = d2.equalityTest
+	d.maximumValueCount = d2.maximumValueCount
+	d.filter = d2.filter
+}
+
 func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
 	if equalityTest == nil {
 		return
