@@ -11,20 +11,7 @@ func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
 	d.mutex.Lock()
 
 	d.equalityTest = equalityTest
-
-	if s := d.store; s != nil {
-		if l := len(s); l > 0 {
-			for i := 0; i < l; i++ {
-				for j := i + 1; j < l; j++ {
-					if equalityTest(s[i], s[j]) {
-						d.removeOneFromIndex(j)
-						l--
-						j--
-					}
-				}
-			}
-		}
-	}
+	d.removeDuplicates()
 
 	return
 }

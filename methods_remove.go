@@ -1,5 +1,29 @@
 package set
 
+// mutex should be locked before calling
+func (d *datum) removeDuplicates() (success bool) {
+	if s := d.store; s != nil {
+		if l := len(s); l > 0 {
+			for i := 0; i < l; i++ {
+				for j := i + 1; j < l; j++ {
+					if d.equalityTest(s[i], s[j]) {
+						d.removeOneFromIndex(j)
+						l--
+						j--
+						success = true
+					}
+				}
+			}
+		}
+	}
+
+	if success {
+		d.clearCachedHash()
+	}
+
+	return
+}
+
 // mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
 func (d *datum) removeOneFromIndex(i int) {
