@@ -4,6 +4,16 @@ package set
 // clearCachedHash method should be called afterwards;
 // s.value should not equal nil
 func (d *datum) addOneFromDatum(s *storeDatum) (success bool) {
+	if m := d.maximumValueCount; m != nil {
+		if l, n := len(d.store), *m; l >= n {
+			if l > n {
+				d.store = d.store[:n]
+			}
+
+			return
+		}
+	}
+
 	for _, s2 := range d.store {
 		if d.equalityTest(s, s2) {
 			return
@@ -25,12 +35,6 @@ func (d *datum) addOne(value interface{}) (success bool) {
 	}
 
 	return
-}
-
-// mutex should be locked before calling
-func (d *datum) clearCachedHash() {
-	d.cachedHash = nil
-	d.sorted = false
 }
 
 func (d *datum) Add(values ...interface{}) (success bool) {

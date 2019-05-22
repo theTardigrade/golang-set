@@ -29,9 +29,10 @@ func (s storeData) Swap(i, j int) {
 }
 
 type datum struct {
-	store        storeData
-	equalityTest equalityTestFunc
-	cachedHash   *uint64
-	sorted       bool
-	mutex        sync.RWMutex
+	store             storeData
+	equalityTest      equalityTestFunc
+	cachedHash        *uint64
+	maximumValueCount *int
+	sorted            bool
+	mutex             sync.RWMutex
 }
