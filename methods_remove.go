@@ -10,6 +10,9 @@ func (d *datum) removeDuplicates() (success bool) {
 						d.removeOneFromIndex(j)
 						l--
 						j--
+						if d.multiMode {
+							s[i].Instances++
+						}
 						success = true
 					}
 				}
@@ -28,6 +31,13 @@ func (d *datum) removeDuplicates() (success bool) {
 // clearCachedHash method should be called afterwards
 func (d *datum) removeOneFromIndex(i int) {
 	if j := len(d.store) - 1; i <= j {
+		s := d.store[i]
+		if d.multiMode {
+			if s.Instances--; s.Instances > 0 {
+				return
+			}
+		}
+
 		d.store[j], d.store[i] = d.store[i], d.store[j]
 		d.store = d.store[:j]
 	}

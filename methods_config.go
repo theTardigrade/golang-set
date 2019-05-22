@@ -4,6 +4,7 @@ func (d *datum) copyConfig(d2 *datum) {
 	d.equalityTest = d2.equalityTest
 	d.maximumValueCount = d2.maximumValueCount
 	d.filter = d2.filter
+	d.multiMode = d2.multiMode
 }
 
 func (d *datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
@@ -73,4 +74,19 @@ func (d *datum) SetFilter(f filterFunc) (success bool) {
 	}
 
 	return
+}
+
+func (d *datum) SetMultiMode(multiMode bool) {
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
+	if prevMultiMode := d.multiMode; multiMode != prevMultiMode {
+		d.multiMode = multiMode
+
+		if prevMultiMode {
+			for _, s := range d.store {
+				s.Instances = 1
+			}
+		}
+	}
 }

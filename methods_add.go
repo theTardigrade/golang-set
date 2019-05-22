@@ -22,6 +22,11 @@ func (d *datum) addOneFromDatum(s *StoreDatum) (success bool) {
 
 	for _, s2 := range d.store {
 		if d.equalityTest(s, s2) {
+			if d.multiMode {
+				s2.Instances++
+				success = true
+			}
+
 			return
 		}
 	}

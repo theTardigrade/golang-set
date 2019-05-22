@@ -6,8 +6,9 @@ import (
 
 func newStoreDatum(value interface{}) *StoreDatum {
 	return &StoreDatum{
-		Value: value,
-		Hash:  hash.Get(value),
+		Value:     value,
+		Hash:      hash.Get(value),
+		Instances: 1,
 	}
 }
 

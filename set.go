@@ -21,9 +21,10 @@ var (
 )
 
 type StoreDatum struct {
-	Value interface{}
-	Hash  uint64
-	index *int
+	Value     interface{}
+	Hash      uint64
+	Instances int
+	index     *int
 }
 
 type storeData []*StoreDatum
@@ -43,5 +44,6 @@ type datum struct {
 	maximumValueCount *int
 	filter            filterFunc
 	sorted            bool
+	multiMode         bool
 	mutex             sync.RWMutex
 }
