@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	filterFunc       FilterCallback
+	filterFunc       filterCallback
 	equalityTestFunc (func(*storeDatum, *storeDatum) bool)
 )
 

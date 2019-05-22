@@ -2,9 +2,9 @@ package set
 
 import "reflect"
 
-type ForEachCallback (func(interface{}))
+type forEachCallback (func(interface{}))
 
-func (d *datum) ForEach(callback ForEachCallback) {
+func (d *datum) ForEach(callback forEachCallback) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -13,9 +13,9 @@ func (d *datum) ForEach(callback ForEachCallback) {
 	}
 }
 
-type MapCallback (func(interface{}) interface{})
+type mapCallback (func(interface{}) interface{})
 
-func (d *datum) Map(callback MapCallback) {
+func (d *datum) Map(callback mapCallback) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
@@ -24,9 +24,9 @@ func (d *datum) Map(callback MapCallback) {
 	}
 }
 
-type FilterCallback (func(interface{}) bool)
+type filterCallback (func(interface{}) bool)
 
-func (d *datum) Filter(callback FilterCallback) {
+func (d *datum) Filter(callback filterCallback) {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
@@ -44,9 +44,9 @@ func (d *datum) Filter(callback FilterCallback) {
 	}
 }
 
-type ReduceCallback (func(interface{}, interface{}) interface{})
+type reduceCallback (func(interface{}, interface{}) interface{})
 
-func (d *datum) Reduce(initialValue interface{}, callback ReduceCallback) (accumulator interface{}) {
+func (d *datum) Reduce(initialValue interface{}, callback reduceCallback) (accumulator interface{}) {
 	accumulator = initialValue
 
 	defer d.mutex.RUnlock()
@@ -173,9 +173,9 @@ func (d *datum) Float64Product() (accumulator float64) {
 	return
 }
 
-type EveryCallback FilterCallback
+type everyCallback filterCallback
 
-func (d *datum) Every(callback EveryCallback) (success bool) {
+func (d *datum) Every(callback everyCallback) (success bool) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
@@ -189,9 +189,9 @@ func (d *datum) Every(callback EveryCallback) (success bool) {
 	return
 }
 
-type SomeCallback EveryCallback
+type someCallback filterCallback
 
-func (d *datum) Some(callback SomeCallback) (success bool) {
+func (d *datum) Some(callback someCallback) (success bool) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
