@@ -36,7 +36,7 @@ func Intersection(d1, d2 *datum) (d3 *datum) {
 	}
 
 	for _, s := range d1.store {
-		if d2.contains(s.Value) {
+		if d2.containsFromDatum(s) {
 			d3.addOneFromDatum(s)
 		}
 	}
@@ -55,7 +55,7 @@ func Difference(d1, d2 *datum) (d3 *datum) {
 	d3.copyConfig(d1)
 
 	for _, s := range d2.store {
-		if !d1.contains(s.Value) {
+		if !d1.containsFromDatum(s) {
 			d3.addOneFromDatum(s)
 		}
 	}
@@ -70,7 +70,7 @@ func Subset(d1, d2 *datum) (success bool) {
 	d2.mutex.RLock()
 
 	for _, s := range d1.store {
-		if !d2.contains(s.Value) {
+		if !d2.containsFromDatum(s) {
 			return
 		}
 	}
