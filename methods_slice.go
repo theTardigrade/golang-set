@@ -8,7 +8,7 @@ func (d *datum) Slice() (values []interface{}) {
 	values = make([]interface{}, 0, l)
 
 	for l--; l >= 0; l-- {
-		values = append(values, d.store[l].value)
+		values = append(values, d.store[l].Value)
 	}
 
 	return

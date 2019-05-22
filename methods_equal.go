@@ -20,5 +20,5 @@ func (d *datum) Equal(d2 *datum) bool {
 		return true
 	}
 
-	return d.hash() == d2.hash()
+	return d.Hash() == d2.Hash()
 }

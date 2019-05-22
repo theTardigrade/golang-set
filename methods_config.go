@@ -53,7 +53,7 @@ func (d *datum) SetFilter(f filterFunc) (success bool) {
 			var modified bool
 
 			for l--; l >= 0; l-- {
-				if v := s[l].value; !f(v) {
+				if v := s[l].Value; !f(v) {
 					d.removeOneFromIndex(l)
 					modified = true
 				}

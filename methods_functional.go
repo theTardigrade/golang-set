@@ -9,7 +9,7 @@ func (d *datum) ForEach(callback forEachCallback) {
 	d.mutex.RLock()
 
 	for _, s := range d.store {
-		callback(s.value)
+		callback(s.Value)
 	}
 }
 
@@ -20,7 +20,7 @@ func (d *datum) Map(callback mapCallback) {
 	d.mutex.Lock()
 
 	for i, s := range d.store {
-		d.store[i].value = callback(s.value)
+		d.store[i].Value = callback(s.Value)
 	}
 }
 
@@ -33,7 +33,7 @@ func (d *datum) Filter(callback filterCallback) {
 	var modified bool
 
 	for i, s := range d.store {
-		if !callback(s.value) {
+		if !callback(s.Value) {
 			d.removeOneFromIndex(i)
 			modified = true
 		}
@@ -53,7 +53,7 @@ func (d *datum) Reduce(initialValue interface{}, callback reduceCallback) (accum
 	d.mutex.RLock()
 
 	for _, s := range d.store {
-		accumulator = callback(accumulator, s.value)
+		accumulator = callback(accumulator, s.Value)
 	}
 
 	return
@@ -70,7 +70,7 @@ func (d *datum) Int64Sum() (accumulator int64) {
 	for _, s := range d.store {
 		var newValue int64
 
-		switch value := s.value.(type) {
+		switch value := s.Value.(type) {
 		case int64:
 			newValue = value
 		case int, int8, int16, int32,
@@ -97,7 +97,7 @@ func (d *datum) Int64Product() (accumulator int64) {
 	for _, s := range d.store {
 		var newValue int64
 
-		switch value := s.value.(type) {
+		switch value := s.Value.(type) {
 		case int64:
 			newValue = value
 		case int, int8, int16, int32,
@@ -126,7 +126,7 @@ func (d *datum) Float64Sum() (accumulator float64) {
 	for _, s := range d.store {
 		var newValue float64
 
-		switch value := s.value.(type) {
+		switch value := s.Value.(type) {
 		case float64:
 			newValue = value
 		case float32,
@@ -154,7 +154,7 @@ func (d *datum) Float64Product() (accumulator float64) {
 	for _, s := range d.store {
 		var newValue float64
 
-		switch value := s.value.(type) {
+		switch value := s.Value.(type) {
 		case float64:
 			newValue = value
 		case float32,
@@ -180,7 +180,7 @@ func (d *datum) Every(callback everyCallback) (success bool) {
 	d.mutex.RLock()
 
 	for _, s := range d.store {
-		if !callback(s.value) {
+		if !callback(s.Value) {
 			return
 		}
 	}
@@ -196,7 +196,7 @@ func (d *datum) Some(callback someCallback) (success bool) {
 	d.mutex.RLock()
 
 	for _, s := range d.store {
-		if callback(s.value) {
+		if callback(s.Value) {
 			success = true
 			break
 		}

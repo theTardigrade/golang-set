@@ -11,7 +11,7 @@ func (d *datum) removeOneFromIndex(i int) {
 
 // mutex should be locked before calling;
 // clearCachedHash method should be called afterwards
-func (d *datum) removeOneFromDatum(s *storeDatum) (success bool) {
+func (d *datum) removeOneFromDatum(s *StoreDatum) (success bool) {
 	for i, s2 := range d.store {
 		if d.equalityTest(s, s2) {
 			d.removeOneFromIndex(i)

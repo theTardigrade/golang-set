@@ -2,8 +2,8 @@ package set
 
 // mutex should be locked before calling;
 // clearCachedHash method should be called afterwards;
-// s.value should not equal nil
-func (d *datum) addOneFromDatum(s *storeDatum) (success bool) {
+// s.Value should not equal nil
+func (d *datum) addOneFromDatum(s *StoreDatum) (success bool) {
 	if m := d.maximumValueCount; m != nil {
 		if l, n := len(d.store), *m; l >= n {
 			if l > n {
@@ -15,7 +15,7 @@ func (d *datum) addOneFromDatum(s *storeDatum) (success bool) {
 	}
 
 	if f := d.filter; f != nil {
-		if !f(s.value) {
+		if !f(s.Value) {
 			return
 		}
 	}

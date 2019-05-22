@@ -9,7 +9,7 @@ import (
 // mutex should be read-locked before calling
 func (d *datum) storeValueStringFromIndex(i int) (s string) {
 	if i >= 0 && i < len(d.store) {
-		s = fmt.Sprintf("%v", d.store[i].value)
+		s = fmt.Sprintf("%v", d.store[i].Value)
 	}
 
 	return

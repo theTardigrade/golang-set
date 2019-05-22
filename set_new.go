@@ -4,14 +4,14 @@ import (
 	"github.com/theTardigrade/set/internal/hash"
 )
 
-func newStoreDatum(value interface{}) *storeDatum {
-	return &storeDatum{
-		value: value,
-		hash:  hash.Get(value),
+func newStoreDatum(value interface{}) *StoreDatum {
+	return &StoreDatum{
+		Value: value,
+		Hash:  hash.Get(value),
 	}
 }
 
-func newStoreDatumWithIndex(value interface{}, index int) *storeDatum {
+func newStoreDatumWithIndex(value interface{}, index int) *StoreDatum {
 	s := newStoreDatum(value)
 	s.index = &index
 	return s

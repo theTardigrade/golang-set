@@ -18,5 +18,5 @@ func (d *datum) Hash() uint64 {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
-	return d.hash()
+	return d.Hash()
 }
