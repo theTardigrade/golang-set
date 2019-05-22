@@ -6,15 +6,16 @@ func (d *Datum) makeStore(capacity int) {
 }
 
 // mutex should be locked before calling
-func (d *Datum) clearCachedHash() {
+func (d *Datum) clearCachedFields() {
 	d.cachedHash = nil
+	d.cachedInstancesLen = nil
 	d.sorted = false
 }
 
 // mutex should be locked before calling
 func (d *Datum) clear(capacity int) {
 	d.makeStore(capacity)
-	d.clearCachedHash()
+	d.clearCachedFields()
 }
 
 func (d *Datum) Clear(keepCapacity bool) {

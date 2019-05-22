@@ -68,7 +68,7 @@ func (d *Datum) SetFilter(f filterFunc) (success bool) {
 			}
 
 			if modified {
-				d.clearCachedHash()
+				d.clearCachedFields()
 			}
 		}
 	}

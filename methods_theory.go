@@ -15,7 +15,7 @@ func (d *Datum) Union(d2 *Datum) {
 	}
 
 	if modified {
-		d.clearCachedHash()
+		d.clearCachedFields()
 	}
 }
 
@@ -36,7 +36,7 @@ func (d *Datum) Intersection(d2 *Datum) {
 	}
 
 	if modified {
-		d.clearCachedHash()
+		d.clearCachedFields()
 	}
 }
 
@@ -55,7 +55,7 @@ func (d *Datum) Difference(d2 *Datum) {
 	}
 
 	d.store = data
-	d.clearCachedHash()
+	d.clearCachedFields()
 }
 
 func (d *Datum) Subset(d2 *Datum) bool {

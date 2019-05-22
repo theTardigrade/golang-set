@@ -4,9 +4,15 @@ func (d *Datum) Len(includeInstances bool) (value int) {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
 
-	if includeInstances {
-		for _, s := range d.store {
-			value += s.Instances
+	if includeInstances && d.multiMode {
+		if d.cachedInstancesLen != nil {
+			value = *d.cachedInstancesLen
+		} else {
+			for _, s := range d.store {
+				value += s.Instances
+			}
+
+			d.cachedInstancesLen = &value
 		}
 	} else {
 		value = len(d.store)

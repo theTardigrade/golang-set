@@ -40,7 +40,7 @@ func (d *Datum) Filter(callback filterCallback) {
 	}
 
 	if modified {
-		d.clearCachedHash()
+		d.clearCachedFields()
 	}
 }
 

@@ -12,7 +12,7 @@ func (d *Datum) Pop() (value interface{}) {
 	value, index := d.pick()
 	if value != nil {
 		d.removeOneFromIndex(index)
-		d.clearCachedHash()
+		d.clearCachedFields()
 	}
 
 	return

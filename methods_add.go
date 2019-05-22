@@ -1,7 +1,7 @@
 package set
 
 // mutex should be locked before calling;
-// clearCachedHash method should be called afterwards;
+// clearCachedFields method should be called afterwards;
 // s.Value should not equal nil
 func (d *Datum) addOneFromDatum(s *StoreDatum) (success bool) {
 	if m := d.maximumValueCount; m != nil {
@@ -38,7 +38,7 @@ func (d *Datum) addOneFromDatum(s *StoreDatum) (success bool) {
 }
 
 // mutex should be locked before calling;
-// clearCachedHash method should be called afterwards
+// clearCachedFields method should be called afterwards
 func (d *Datum) addOne(value interface{}) (success bool) {
 	if value != nil {
 		s := newStoreDatumWithIndex(value, len(d.store))
@@ -60,7 +60,7 @@ func (d *Datum) Add(values ...interface{}) (success bool) {
 		}
 
 		if success {
-			d.clearCachedHash()
+			d.clearCachedFields()
 		}
 	}
 

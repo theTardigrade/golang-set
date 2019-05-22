@@ -21,14 +21,14 @@ func (d *Datum) removeDuplicates() (success bool) {
 	}
 
 	if success {
-		d.clearCachedHash()
+		d.clearCachedFields()
 	}
 
 	return
 }
 
 // mutex should be locked before calling;
-// clearCachedHash method should be called afterwards
+// clearCachedFields method should be called afterwards
 func (d *Datum) removeOneFromIndex(i int) {
 	if j := len(d.store) - 1; i <= j {
 		s := d.store[i]
@@ -44,7 +44,7 @@ func (d *Datum) removeOneFromIndex(i int) {
 }
 
 // mutex should be locked before calling;
-// clearCachedHash method should be called afterwards
+// clearCachedFields method should be called afterwards
 func (d *Datum) removeOneFromDatum(s *StoreDatum) (success bool) {
 	for i, s2 := range d.store {
 		if d.equalityTest(s, s2) {
@@ -58,7 +58,7 @@ func (d *Datum) removeOneFromDatum(s *StoreDatum) (success bool) {
 }
 
 // mutex should be locked before calling;
-// clearCachedHash method should be called afterwards
+// clearCachedFields method should be called afterwards
 func (d *Datum) removeOne(value interface{}) bool {
 	s := newStoreDatum(value)
 	return d.removeOneFromDatum(s)
@@ -75,7 +75,7 @@ func (d *Datum) Remove(values ...interface{}) (success bool) {
 	}
 
 	if success {
-		d.clearCachedHash()
+		d.clearCachedFields()
 	}
 
 	return
