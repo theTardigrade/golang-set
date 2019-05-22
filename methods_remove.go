@@ -46,17 +46,3 @@ func (d *datum) Remove(values ...interface{}) (success bool) {
 
 	return
 }
-
-// mutex should be read-locked before calling
-func (d *datum) contains(value interface{}) (success bool) {
-	s1 := newStoreDatum(value)
-
-	for _, s2 := range d.store {
-		if d.equalityTest(s1, s2) {
-			success = true
-			break
-		}
-	}
-
-	return
-}

@@ -1,5 +1,19 @@
 package set
 
+// mutex should be read-locked before calling
+func (d *datum) contains(value interface{}) (success bool) {
+	s1 := newStoreDatum(value)
+
+	for _, s2 := range d.store {
+		if d.equalityTest(s1, s2) {
+			success = true
+			break
+		}
+	}
+
+	return
+}
+
 func (d *datum) Contains(value interface{}) bool {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()
