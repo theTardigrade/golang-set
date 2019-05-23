@@ -6,13 +6,15 @@ import (
 	"strings"
 )
 
-// mutex should be read-locked before calling
-func (d *Datum) storeValueStringFromIndex(i int) (s string) {
-	if i >= 0 && i < len(d.store) {
-		s = fmt.Sprintf("%v", d.store[i].Value)
+func (d *Datum) valueStringFromIndex(i int) string {
+	s := d.store[i]
+
+	if s.valueString == nil {
+		v := fmt.Sprintf("%v", s.Value)
+		s.valueString = &v
 	}
 
-	return
+	return *s.valueString
 }
 
 func (d *Datum) String() string {
@@ -28,15 +30,15 @@ func (d *Datum) String() string {
 		d.sorted = true
 	}
 
-	builder.Grow(l * 4)
+	builder.Grow(l * 8)
 	builder.WriteByte('[')
 
 	if l > 0 {
-		builder.WriteString(d.storeValueStringFromIndex(0))
+		builder.WriteString(d.valueStringFromIndex(0))
 
 		for l--; l > 0; l-- {
 			builder.WriteByte(' ')
-			builder.WriteString(d.storeValueStringFromIndex(l))
+			builder.WriteString(d.valueStringFromIndex(l))
 		}
 	}
 
