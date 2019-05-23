@@ -21,11 +21,12 @@ var (
 )
 
 type StoreDatum struct {
-	Value       interface{}
-	valueString *string
-	Hash        uint64
-	Instances   int
-	index       *int
+	Value           interface{}
+	valueString     *string
+	Hash            uint64
+	Instances       int
+	index           *int
+	UnixNanoSetTime int64
 }
 
 type storeData []*StoreDatum

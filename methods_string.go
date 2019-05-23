@@ -36,9 +36,9 @@ func (d *Datum) String() string {
 	if l > 0 {
 		builder.WriteString(d.valueStringFromIndex(0))
 
-		for l--; l > 0; l-- {
+		for i := 1; i < l; i++ {
 			builder.WriteByte(' ')
-			builder.WriteString(d.valueStringFromIndex(l))
+			builder.WriteString(d.valueStringFromIndex(i))
 		}
 	}
 

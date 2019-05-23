@@ -1,5 +1,10 @@
 package set
 
+import (
+	"math"
+	"sort"
+)
+
 func (d *Datum) copyConfig(d2 *Datum) {
 	d.equalityTest = d2.equalityTest
 	d.maximumValueCount = d2.maximumValueCount
@@ -8,42 +13,45 @@ func (d *Datum) copyConfig(d2 *Datum) {
 }
 
 func (d *Datum) SetConfig(c *Config) {
-	d.SetEqualityTest(c.EqualityTest)
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
+	d.setEqualityTest(c.EqualityTest)
 	if m := c.MaximumValueCount; m != nil {
-		d.SetMaximumValueCount(*m)
+		d.setMaximumValueCount(*m)
 	}
-	d.SetFilter(c.Filter)
-	d.SetMultiMode(c.MultiMode)
+	d.setFilter(c.Filter)
+	d.setMultiMode(c.MultiMode)
 	if c := c.Capacity; c != nil {
-		d.Grow(*c)
+		d.setCapacity(*c)
 	}
 }
 
-func (d *Datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
+// mutex should be locked before calling
+func (d *Datum) setEqualityTest(equalityTest equalityTestFunc) (success bool) {
 	if equalityTest == nil {
 		return
 	}
 
-	success = true
-
-	defer d.mutex.Unlock()
-	d.mutex.Lock()
-
 	d.equalityTest = equalityTest
 	d.removeDuplicates()
+	success = true
 
 	return
 }
 
-func (d *Datum) SetMaximumValueCount(n int) (success bool) {
+func (d *Datum) SetEqualityTest(equalityTest equalityTestFunc) bool {
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
+	return d.setEqualityTest(equalityTest)
+}
+
+// mutex should be locked before calling
+func (d *Datum) setMaximumValueCount(n int) (success bool) {
 	if n < 0 {
 		return
 	}
-
-	success = true
-
-	defer d.mutex.Unlock()
-	d.mutex.Lock()
 
 	d.maximumValueCount = &n
 
@@ -53,18 +61,23 @@ func (d *Datum) SetMaximumValueCount(n int) (success bool) {
 		}
 	}
 
+	success = true
+
 	return
 }
 
-func (d *Datum) SetFilter(f filterFunc) (success bool) {
+func (d *Datum) SetMaximumValueCount(n int) bool {
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
+	return d.setMaximumValueCount(n)
+}
+
+// mutex should be locked before calling
+func (d *Datum) setFilter(f filterFunc) (success bool) {
 	if f == nil {
 		return
 	}
-
-	success = true
-
-	defer d.mutex.Unlock()
-	d.mutex.Lock()
 
 	d.filter = f
 
@@ -85,15 +98,23 @@ func (d *Datum) SetFilter(f filterFunc) (success bool) {
 		}
 	}
 
+	success = true
+
 	return
 }
 
-func (d *Datum) SetMultiMode(multiMode bool) {
+func (d *Datum) SetFilter(f filterFunc) bool {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
+	return d.setFilter(f)
+}
+
+// mutex should be locked before calling
+func (d *Datum) setMultiMode(multiMode bool) (success bool) {
 	if prevMultiMode := d.multiMode; multiMode != prevMultiMode {
 		d.multiMode = multiMode
+		success = true
 
 		if prevMultiMode {
 			for _, s := range d.store {
@@ -101,4 +122,66 @@ func (d *Datum) SetMultiMode(multiMode bool) {
 			}
 		}
 	}
+
+	return
+}
+
+func (d *Datum) SetMultiMode(multiMode bool) bool {
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
+	return d.setMultiMode(multiMode)
+}
+
+// mutex should be locked before calling
+func (d *Datum) setCapacity(newCapacity int) (success bool) {
+	if newCapacity < 0 {
+		return
+	}
+
+	var oldCapacity int
+	oldStore := d.store
+
+	if oldStore != nil {
+		oldCapacity = cap(oldStore)
+	}
+
+	if newCapacity > oldCapacity {
+		d.makeStore(newCapacity)
+
+		for _, s := range oldStore {
+			d.store = append(d.store, s)
+		}
+
+		success = true
+	} else if newCapacity < oldCapacity {
+		d.makeStore(newCapacity)
+
+		if newCapacity > 0 {
+			if !d.sorted {
+				sort.Sort(oldStore)
+				d.sorted = true
+			}
+
+			l := int(math.Min(
+				float64(newCapacity),
+				float64(len(oldStore)),
+			))
+
+			for i := 0; i < l; i++ {
+				d.store = append(d.store, oldStore[i])
+			}
+		}
+
+		success = true
+	}
+
+	return
+}
+
+func (d *Datum) SetCapacity(newCapacity int) bool {
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
+	return d.setCapacity(newCapacity)
 }
