@@ -16,6 +16,8 @@ func (d *Datum) storeValueStringFromIndex(i int) (s string) {
 }
 
 func (d *Datum) String() string {
+	var builder strings.Builder
+
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
@@ -26,8 +28,7 @@ func (d *Datum) String() string {
 		d.sorted = true
 	}
 
-	var builder strings.Builder
-
+	builder.Grow(l * 4)
 	builder.WriteByte('[')
 
 	if l > 0 {
