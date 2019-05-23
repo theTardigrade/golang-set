@@ -18,7 +18,7 @@ func (d *Datum) SetConfig(c *Config) {
 	d.setFilter(c.Filter)
 	d.setMultiMode(c.MultiMode)
 	if c := c.Capacity; c != nil {
-		d.setCapacity(*c)
+		d.setCap(*c)
 	}
 }
 
