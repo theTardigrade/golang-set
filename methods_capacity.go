@@ -13,7 +13,7 @@ func (d *Datum) Cap() int {
 }
 
 // mutex should be locked before calling
-func (d *Datum) setCapacity(newCapacity int) (success bool) {
+func (d *Datum) setCap(newCapacity int) (success bool) {
 	if newCapacity < 0 {
 		return
 	}
@@ -58,9 +58,9 @@ func (d *Datum) setCapacity(newCapacity int) (success bool) {
 	return
 }
 
-func (d *Datum) SetCapacity(newCapacity int) bool {
+func (d *Datum) SetCap(newCapacity int) bool {
 	defer d.mutex.Unlock()
 	d.mutex.Lock()
 
-	return d.setCapacity(newCapacity)
+	return d.setCap(newCapacity)
 }
