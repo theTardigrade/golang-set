@@ -7,6 +7,18 @@ func (d *Datum) copyConfig(d2 *Datum) {
 	d.multiMode = d2.multiMode
 }
 
+func (d *Datum) SetConfig(c *Config) {
+	d.SetEqualityTest(c.EqualityTest)
+	if m := c.MaximumValueCount; m != nil {
+		d.SetMaximumValueCount(*m)
+	}
+	d.SetFilter(c.Filter)
+	d.SetMultiMode(c.MultiMode)
+	if c := c.Capacity; c != nil {
+		d.Grow(*c)
+	}
+}
+
 func (d *Datum) SetEqualityTest(equalityTest equalityTestFunc) (success bool) {
 	if equalityTest == nil {
 		return

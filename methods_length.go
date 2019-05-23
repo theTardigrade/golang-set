@@ -28,6 +28,30 @@ func (d *Datum) Cap() int {
 	return cap(d.store)
 }
 
+func (d *Datum) Grow(newCapacity int) (success bool) {
+	defer d.mutex.Unlock()
+	d.mutex.Lock()
+
+	var oldCapacity int
+	oldStore := d.store
+
+	if oldStore != nil {
+		oldCapacity = cap(oldStore)
+	}
+
+	if newCapacity > oldCapacity {
+		d.makeStore(newCapacity)
+
+		for _, s := range oldStore {
+			d.store = append(d.store, s)
+		}
+
+		success = true
+	}
+
+	return
+}
+
 func (d *Datum) Empty() bool {
 	defer d.mutex.RUnlock()
 	d.mutex.RLock()

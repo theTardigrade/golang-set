@@ -32,6 +32,14 @@ func NewWithCapacity(c int) (d *Datum) {
 	return
 }
 
+func NewWithConfig(c *Config) (d *Datum) {
+	d = New()
+
+	d.SetConfig(c)
+
+	return
+}
+
 func NewFromSlice(s []interface{}) (d *Datum) {
 	l := len(s)
 	d = NewWithCapacity(l)

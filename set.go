@@ -40,12 +40,12 @@ func (s storeData) Swap(i, j int) {
 
 type Datum struct {
 	store              storeData
-	equalityTest       equalityTestFunc
 	cachedHash         *uint64
 	cachedInstancesLen *int
-	maximumValueCount  *int
-	filter             filterFunc
 	sorted             bool
+	equalityTest       equalityTestFunc
+	filter             filterFunc
+	maximumValueCount  *int
 	multiMode          bool
 	mutex              sync.RWMutex
 }
