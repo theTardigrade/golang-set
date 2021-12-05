@@ -1,7 +1,6 @@
 # set
-## Golang implementation of the set datastructure
 
-If you use this package, please consider donating at PayPal: [https://www.paypal.me/jismithpp](https://www.paypal.me/jismithpp)
+Golang implementation of the set datastructure
 
 ### Example
 
