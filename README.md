@@ -1,4 +1,4 @@
-# set
+# golang-set
 
 Golang implementation of the set datastructure
 
